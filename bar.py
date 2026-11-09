@@ -9,7 +9,10 @@ def load_events():
     if os.path.exists(CACHE_FILE):
         try:
             with open(CACHE_FILE) as f:
-                return json.load(f)
+                data = json.load(f)
+                if isinstance(data, dict) and "events" in data:
+                    return data["events"]
+                return data
         except Exception:
             pass
     return {}

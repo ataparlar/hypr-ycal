@@ -8,6 +8,7 @@ gi.require_version("PangoCairo", "1.0")
 from gi.repository import Gtk, GLib, Gtk4LayerShell, Pango, PangoCairo
 import calendar
 import datetime
+import html
 import json
 import math
 import os
@@ -108,13 +109,17 @@ def _run_sync():
                         events_by_date.setdefault(d.isoformat(), []).append(title)
                         d += datetime.timedelta(days=1)
 
-        # Fetch Google Tasks with due dates
+        # Fetch Google Tasks with due dates and structured task lists
         tasks_service = build('tasks', 'v1', credentials=creds)
         task_lists = tasks_service.tasklists().list().execute()
+        task_lists_data = []
         for tl in task_lists.get('items', []):
+            tl_id = tl['id']
+            tl_title = tl.get('title', 'Tasks')
+            tl_tasks = []
             try:
                 tasks = tasks_service.tasks().list(
-                    tasklist=tl['id'],
+                    tasklist=tl_id,
                     showCompleted=True,
                     showHidden=True,
                     maxResults=100,
@@ -125,20 +130,34 @@ def _run_sync():
                 due = task.get('due')
                 title = task.get('title', '(no title)')
                 completed = task.get('status') == 'completed'
+                task_item = {
+                    'type': 'task',
+                    'id': task['id'],
+                    'lid': tl_id,
+                    'title': title,
+                    'done': completed,
+                    'due': due[:10] if due else None,
+                }
+                tl_tasks.append(task_item)
                 if due:
                     date_key = due[:10]  # YYYY-MM-DD
-                    events_by_date.setdefault(date_key, []).append({
-                        'type': 'task',
-                        'id': task['id'],
-                        'lid': tl['id'],
-                        'title': title,
-                        'done': completed,
-                    })
+                    events_by_date.setdefault(date_key, []).append(task_item)
+
+            task_lists_data.append({
+                'id': tl_id,
+                'title': tl_title,
+                'tasks': tl_tasks,
+            })
+
+        cache_data = {
+            'events': events_by_date,
+            'task_lists': task_lists_data,
+        }
 
         os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)
         tmp = CACHE_FILE + '.tmp'
         with open(tmp, 'w') as f:
-            json.dump(events_by_date, f)
+            json.dump(cache_data, f)
         os.replace(tmp, CACHE_FILE)
 
     except Exception as e:
@@ -171,14 +190,21 @@ def hex_to_rgba(hex_color, alpha):
     r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
     return f'rgba({r}, {g}, {b}, {alpha})'
 
-def load_events():
+def load_data():
     if os.path.exists(CACHE_FILE):
         try:
             with open(CACHE_FILE) as f:
-                return json.load(f)
+                data = json.load(f)
+                if isinstance(data, dict) and 'events' in data:
+                    return data.get('events', {}), data.get('task_lists', [])
+                return data, []
         except Exception:
             pass
-    return {}
+    return {}, []
+
+def load_events():
+    events, _ = load_data()
+    return events
 
 
 class ClickShield(Gtk.Window):
@@ -217,9 +243,10 @@ class CalendarPopup(Gtk.ApplicationWindow):
         self.year = self.today.year
         self.month = self.today.month
         self.selected_date = self.today
-        self.events = load_events()
+        self.events, self.task_lists = load_data()
         self._selected_btn = None
         self._cred_poll_timer = None
+        self._tasks_visible = True
         self._shield = ClickShield(app, self._hide)
 
         self._setup_window()
@@ -268,7 +295,7 @@ class CalendarPopup(Gtk.ApplicationWindow):
         self.year = self.today.year
         self.month = self.today.month
         self.selected_date = self.today
-        self.events = load_events()
+        self.events, self.task_lists = load_data()
 
     def _show_calendar(self):
         """Switch from setup screen (or initial state) to the calendar view."""
@@ -278,6 +305,7 @@ class CalendarPopup(Gtk.ApplicationWindow):
             f"<b>{datetime.date(self.year, self.month, 1).strftime('%B %Y').upper()}</b>"
         )
         self._update_day_panel(self.today)
+        self._build_task_lists()
 
     def _make_setup_card(self, title_text, msg_text):
         """Build the shared card widget used by both setup screens."""
@@ -409,12 +437,28 @@ class CalendarPopup(Gtk.ApplicationWindow):
         self.refresh_btn.set_size_request(28, 28)
         self.refresh_btn.set_valign(Gtk.Align.CENTER)
         self.refresh_btn.add_css_class('refresh-btn')
+        self.refresh_btn.set_tooltip_text("Sync Google Calendar & Tasks")
         self.refresh_btn.connect("clicked", self._on_refresh_clicked)
+
+        # Toggle Google Tasks lists side by side
+        self.tasks_toggle_btn = Gtk.Button()
+        tasks_toggle_lbl = Gtk.Label(label="\uf0ae")
+        tasks_toggle_lbl.set_halign(Gtk.Align.CENTER)
+        tasks_toggle_lbl.set_valign(Gtk.Align.CENTER)
+        self.tasks_toggle_btn.set_child(tasks_toggle_lbl)
+        self.tasks_toggle_btn.set_size_request(28, 28)
+        self.tasks_toggle_btn.set_valign(Gtk.Align.CENTER)
+        self.tasks_toggle_btn.add_css_class('refresh-btn')
+        self.tasks_toggle_btn.add_css_class('nerd')
+        self.tasks_toggle_btn.add_css_class('active-toggle')
+        self.tasks_toggle_btn.set_tooltip_text("Toggle Google Tasks lists")
+        self.tasks_toggle_btn.connect("clicked", self._on_toggle_tasks_clicked)
 
         header.append(prev_btn)
         header.append(self.month_label)
         header.append(next_btn)
         header.append(self.refresh_btn)
+        header.append(self.tasks_toggle_btn)
         self.left_box.append(header)
 
         self.grid = None
@@ -462,12 +506,23 @@ class CalendarPopup(Gtk.ApplicationWindow):
         edit_btn.set_hexpand(False)
         edit_btn.add_css_class('add-btn')
         edit_btn.add_css_class('nerd')
+        edit_btn.set_tooltip_text("Open day in Google Calendar")
         edit_btn.connect("clicked", self._on_edit_clicked)
         btn_row.append(add_btn)
         btn_row.append(edit_btn)
         self.right_box.append(btn_row)
 
         self._update_day_panel(self.today)
+
+        # ── Task Lists container (side by side near the existings) ─
+        self.task_lists_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+        self.task_lists_scroll = Gtk.ScrolledWindow()
+        self.task_lists_scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
+        self.task_lists_scroll.set_propagate_natural_width(True)
+        self.task_lists_scroll.set_child(self.task_lists_box)
+        self.main_box.append(self.task_lists_scroll)
+
+        self._build_task_lists()
 
     def _build_grid(self):
         if self.grid is not None:
@@ -651,9 +706,10 @@ class CalendarPopup(Gtk.ApplicationWindow):
                 ).execute()
                 _run_sync()
                 def after():
-                    self.events = load_events()
+                    self.events, self.task_lists = load_data()
                     self._build_grid()
                     self._update_day_panel(self.selected_date)
+                    self._build_task_lists()
                     return False
                 GLib.idle_add(after)
             except Exception as e:
@@ -664,6 +720,216 @@ class CalendarPopup(Gtk.ApplicationWindow):
                     return False
                 GLib.idle_add(after_err)
         threading.Thread(target=do_toggle, daemon=True).start()
+
+    def _on_toggle_tasks_clicked(self, _):
+        self._tasks_visible = not self._tasks_visible
+        self.task_lists_scroll.set_visible(self._tasks_visible)
+        if self._tasks_visible:
+            self.tasks_toggle_btn.add_css_class('active-toggle')
+        else:
+            self.tasks_toggle_btn.remove_css_class('active-toggle')
+
+    def _build_task_lists(self):
+        while True:
+            child = self.task_lists_box.get_first_child()
+            if child is None:
+                break
+            self.task_lists_box.remove(child)
+
+        if not self.task_lists:
+            self.task_lists_scroll.set_visible(False)
+            return
+
+        self.task_lists_scroll.set_visible(self._tasks_visible)
+
+        for tl in self.task_lists:
+            sep = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
+            sep.add_css_class('panel-divider')
+            self.task_lists_box.append(sep)
+
+            col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+            col.set_size_request(180, -1)
+            col.add_css_class('day-panel')
+            self.task_lists_box.append(col)
+
+            tl_tasks = tl.get('tasks', [])
+            pending_count = sum(1 for t in tl_tasks if not t.get('done'))
+
+            header_lbl = Gtk.Label()
+            header_lbl.set_markup(
+                f"<b>{html.escape(tl.get('title', 'Tasks'))}</b>  <span alpha='60%'>({pending_count})</span>"
+            )
+            header_lbl.set_halign(Gtk.Align.START)
+            header_lbl.set_ellipsize(Pango.EllipsizeMode.END)
+            header_lbl.set_tooltip_text(tl.get('title', 'Tasks'))
+            header_lbl.add_css_class('day-heading')
+            col.append(header_lbl)
+
+            scroll = Gtk.ScrolledWindow()
+            scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+            scroll.set_vexpand(True)
+            col.append(scroll)
+
+            tasks_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+            scroll.set_child(tasks_box)
+
+            sorted_tasks = sorted(
+                tl_tasks,
+                key=lambda t: (1 if t.get('done') else 0, t.get('due') or '9999-99-99')
+            )
+
+            if sorted_tasks:
+                for task in sorted_tasks:
+                    tasks_box.append(self._make_task_item_row(task))
+            else:
+                empty = Gtk.Label(label="No tasks")
+                empty.add_css_class('no-events')
+                empty.set_halign(Gtk.Align.START)
+                tasks_box.append(empty)
+
+            col.append(self._make_task_list_bottom_row(tl))
+
+    def _make_task_item_row(self, task):
+        row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        done = task.get('done', False)
+
+        dot = Gtk.Label(label="•")
+        dot.add_css_class('done-dot' if done else 'task-dot')
+        row.append(dot)
+
+        name = Gtk.Label()
+        name.set_hexpand(True)
+        name.set_halign(Gtk.Align.START)
+        name.set_ellipsize(Pango.EllipsizeMode.END)
+        name.add_css_class('event-name')
+
+        title = task.get('title', '(no title)')
+        due = task.get('due')  # YYYY-MM-DD
+        tooltip_parts = [title]
+        due_badge = ""
+        if due:
+            try:
+                d_obj = datetime.date.fromisoformat(due)
+                today = datetime.date.today()
+                if d_obj == today:
+                    due_badge = "<span alpha='70%' font_size='9pt' color='#ffb86c'>Today</span>"
+                    tooltip_parts.append("(Due: Today)")
+                elif d_obj < today and not done:
+                    due_badge = f"<span font_size='9pt' color='#ff5555'>{d_obj.strftime('%d %b')}</span>"
+                    tooltip_parts.append(f"(Overdue: {d_obj.strftime('%d %b')})")
+                else:
+                    due_badge = f"<span alpha='50%' font_size='9pt'>{d_obj.strftime('%d %b')}</span>"
+                    tooltip_parts.append(f"(Due: {d_obj.strftime('%d %b')})")
+            except Exception:
+                due_badge = ""
+
+        if done:
+            name.set_markup(f"<span alpha='50%'><s>{html.escape(title)}</s></span>")
+        else:
+            if due_badge:
+                name.set_markup(f"{html.escape(title)}  {due_badge}")
+            else:
+                name.set_text(title)
+
+        name.set_tooltip_text(" ".join(tooltip_parts))
+        row.append(name)
+
+        toggle = Gtk.Button(label="✓")
+        toggle.add_css_class('done-toggle')
+        toggle.add_css_class('done-toggle-active' if done else 'done-toggle-inactive')
+        toggle.connect("clicked", self._on_task_toggle, task)
+        row.append(toggle)
+
+        return row
+
+    def _make_task_list_bottom_row(self, tl):
+        container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+
+        btn_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        btn_row.set_size_request(-1, 32)
+
+        add_btn = Gtk.Button(label="+ Add task")
+        add_btn.add_css_class('add-btn')
+        add_btn.set_hexpand(True)
+
+        open_btn = Gtk.Button()
+        open_lbl = Gtk.Label(label="\uf08e")
+        open_lbl.set_halign(Gtk.Align.CENTER)
+        open_lbl.set_valign(Gtk.Align.CENTER)
+        open_btn.set_child(open_lbl)
+        open_btn.set_size_request(32, -1)
+        open_btn.set_hexpand(False)
+        open_btn.add_css_class('add-btn')
+        open_btn.add_css_class('nerd')
+        open_btn.set_tooltip_text("Open Google Tasks in browser")
+        open_btn.connect(
+            "clicked",
+            lambda _: subprocess.Popen(['xdg-open', 'https://calendar.google.com/calendar/u/0/r/tasks'])
+        )
+
+        btn_row.append(add_btn)
+        btn_row.append(open_btn)
+        container.append(btn_row)
+
+        entry = Gtk.Entry()
+        entry.set_placeholder_text("New task title...")
+        entry.add_css_class('task-entry')
+        entry.set_visible(False)
+        container.append(entry)
+
+        def on_add_clicked(_):
+            btn_row.set_visible(False)
+            entry.set_visible(True)
+            entry.set_text("")
+            entry.grab_focus()
+
+        def on_activate(ent):
+            val = ent.get_text().strip()
+            if val:
+                ent.set_sensitive(False)
+                self._add_task_to_list(tl['id'], val)
+            btn_row.set_visible(True)
+            entry.set_visible(False)
+            entry.set_sensitive(True)
+
+        def on_cancel():
+            btn_row.set_visible(True)
+            entry.set_visible(False)
+
+        add_btn.connect("clicked", on_add_clicked)
+        entry.connect("activate", on_activate)
+
+        key_ctrl = Gtk.EventControllerKey()
+        def on_key(ctrl, keyval, keycode, state):
+            if keyval == 65307:  # Escape key
+                on_cancel()
+                return True
+            return False
+        key_ctrl.connect("key-pressed", on_key)
+        entry.add_controller(key_ctrl)
+
+        return container
+
+    def _add_task_to_list(self, lid, title):
+        def do_add():
+            try:
+                from googleapiclient.discovery import build
+                creds = _get_credentials()
+                if creds is None:
+                    return
+                service = build('tasks', 'v1', credentials=creds)
+                service.tasks().insert(tasklist=lid, body={'title': title}).execute()
+                _run_sync()
+                def after():
+                    self.events, self.task_lists = load_data()
+                    self._build_grid()
+                    self._update_day_panel(self.selected_date)
+                    self._build_task_lists()
+                    return False
+                GLib.idle_add(after)
+            except Exception as e:
+                print(f'[add task error] {e}', file=sys.stderr)
+        threading.Thread(target=do_add, daemon=True).start()
 
     def _draw_refresh_icon(self, da, ctx, width, height):
         """Cairo draw callback. Renders the Nerd Font refresh glyph, rotated when spinning.
@@ -711,9 +977,10 @@ class CalendarPopup(Gtk.ApplicationWindow):
                     self._refresh_spin_timer = None
                 self._refresh_angle = 0.0
                 self._refresh_da.queue_draw()
-                self.events = load_events()
+                self.events, self.task_lists = load_data()
                 self._build_grid()
                 self._update_day_panel(self.selected_date)
+                self._build_task_lists()
                 self.refresh_btn.set_sensitive(True)
                 return False
             GLib.idle_add(after)
@@ -895,6 +1162,23 @@ class CalendarPopup(Gtk.ApplicationWindow):
       }}
       .refresh-btn:hover {{
           background: {hex_to_rgba(accent, 0.28)};
+      }}
+      .refresh-btn.active-toggle {{
+          background: {hex_to_rgba(accent, 0.35)};
+          border-color: {hex_to_rgba(accent, 0.8)};
+      }}
+      .task-entry {{
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          border-radius: 8px;
+          color: {fg};
+          font-size: 11px;
+          padding: 4px 8px;
+          margin-top: 4px;
+      }}
+      .task-entry:focus {{
+          border-color: {hex_to_rgba(accent, 0.8)};
+          background: rgba(255, 255, 255, 0.12);
       }}
       .add-btn.nerd {{
           font-family: "{NERD_FONT}";
