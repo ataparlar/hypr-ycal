@@ -2,3 +2,7 @@ credentials.json
 client_secret*.json
 *.pid
 __pycache__/
+screenshot*
+*.png
+*.jpg
+*.jpeg
