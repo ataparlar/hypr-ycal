@@ -10,15 +10,11 @@ An interactive desktop productivity suite for **Wayland / Hyprland** and **Wayba
 ---
 
 ## Screenshots
+![hypr-ycal-1](screenshots/screenshot-20261110-172919.png)
 
-### Interactive Desktop Background Dashboard (Dark Pastel Theme)
-![Desktop Background Dashboard - Dark Pastel Theme](screenshots/screenshot-20261110-172919.png)
+![hypr-ycal-2](screenshots/screenshot-20261110-173344.png)
 
-### Interactive Desktop Background Dashboard (Neutral Theme)
-![Desktop Background Dashboard - Neutral Theme](screenshots/screenshot-20261110-173344.png)
-
-### Full Desktop Workspace Overview
-![Full Desktop Workspace Overview](screenshots/screenshot-20261110-173500.png)
+![hypr-ycal-3](screenshots/screenshot-20261110-173500.png)
 
 ---
 
