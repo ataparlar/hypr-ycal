@@ -1,6 +1,7 @@
 {
-  "calendar_width": 165,
+  "calendar_width": 680,
+  "calendar_today_split": "50/50",
   "task_panels_fill_rest": true,
   "task_panel_min_width": 260,
-  "_comment": "calendar_width: Left column width in pixels (165 = 2/3 compact, 248 = standard, 340 = wide) or ratio string ('20%', '33%'). task_panels_fill_rest: Expands task boards to fill the rest of the desktop width."
+  "_comment": "calendar_width: Width of left column (Calendar + Today) in pixels (default 680 = at red line). The calendar and Today cards are split 50/50 vertically. task_panels_fill_rest: Task boards expand to fill the rest of the desktop width."
 }

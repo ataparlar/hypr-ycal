@@ -43,7 +43,8 @@ CURRENT_THEME_FILE = os.path.expanduser('~/.config/waybar-ycal/current_theme.jso
 CONFIG_FILE = os.path.expanduser('~/.config/waybar-ycal/config.json')
 
 DEFAULT_CONFIG = {
-    "calendar_width": 165,
+    "calendar_width": 680,
+    "calendar_today_split": "50/50",
     "task_panels_fill_rest": True,
     "task_panel_min_width": 260,
 }
@@ -150,38 +151,36 @@ def load_config():
     return cfg
 
 
-def parse_width_setting(val, default=165, total_width=1920):
+def parse_width_setting(val, default=680, total_width=1920):
     if val is None:
         return default
     if isinstance(val, (int, float)):
         if 0 < val <= 1.0:
-            return max(140, int(total_width * val))
-        return max(140, int(val))
+            return max(300, int(total_width * val))
+        return max(300, int(val))
     if isinstance(val, str):
         val = val.strip().lower()
-        if val in ('2/3', '2/3 compact', 'compact'):
-            return 165
+        if val in ('2/3', '2/3 width', 'red line'):
+            return 680
         if val in ('standard', 'default'):
-            return 248
-        if val in ('wide', 'full'):
-            return 340
+            return 680
         if val.endswith('%'):
             try:
                 pct = float(val[:-1]) / 100.0
-                return max(140, int(total_width * pct))
+                return max(300, int(total_width * pct))
             except ValueError:
                 pass
         if '/' in val:
             try:
                 num, den = val.split('/', 1)
                 ratio = float(num.strip()) / float(den.strip())
-                if 0 < ratio <= 0.6:
-                    return max(140, int(total_width * ratio))
-                return max(140, int(ratio))
+                if 0 < ratio <= 1.0:
+                    return max(300, int(total_width * ratio))
+                return max(300, int(ratio))
             except Exception:
                 pass
         try:
-            return max(140, int(val))
+            return max(300, int(val))
         except ValueError:
             pass
     return default
@@ -200,7 +199,6 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         self.current_theme = load_theme()
         self.config = load_config()
         self.cal_width = self._calc_calendar_width()
-        self.is_compact = (self.cal_width < 220)
 
         self._selected_btn = None
         self._collapsed_parents = set()
@@ -216,7 +214,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         self._build_ui()
 
     def _calc_calendar_width(self):
-        val = self.config.get('calendar_width', 165)
+        val = self.config.get('calendar_width', 680)
         total_w = 1920
         if self.monitor:
             try:
@@ -225,7 +223,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
                     total_w = geom.width
             except Exception:
                 pass
-        return parse_width_setting(val, default=165, total_width=total_w)
+        return parse_width_setting(val, default=680, total_width=total_w)
 
     def _setup_window(self):
         self.set_decorated(False)
@@ -281,11 +279,11 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         content_box.set_hexpand(True)
         self.main_box.append(content_box)
 
-        # ── Left Column: Calendar & Agenda (Customizable Width) ────────
-        self.left_col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8 if self.is_compact else 10)
+        # ── Left Column: Calendar & Agenda (50/50 vertical split, width 680px at red line) ──
+        self.left_col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        self.left_col.set_homogeneous(True)
         self.left_col.set_size_request(self.cal_width, -1)
-        if self.is_compact:
-            self.left_col.add_css_class('compact-calendar')
+        self.left_col.set_hexpand(False)
         content_box.append(self.left_col)
 
         self._build_calendar_card()
@@ -410,20 +408,22 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         self.lists_pill.set_markup(f"<b>📁 {lists_count}</b> Lists")
 
     def _build_calendar_card(self):
-        self.calendar_card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4 if self.is_compact else 6)
+        self.calendar_card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         self.calendar_card.add_css_class('desktop-card')
         self.calendar_card.add_css_class('calendar-card')
-        self.calendar_card.set_size_request(-1, 215 if self.is_compact else 260)
+        self.calendar_card.set_vexpand(True)
         self.left_col.append(self.calendar_card)
 
         # Header: Prev, Month Label, Next, Today button
-        hdr = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
+        hdr = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
         prev_btn = Gtk.Button(label="‹")
         prev_btn.add_css_class('nav-btn')
         prev_btn.connect("clicked", lambda _: self._navigate(-1))
 
         self.month_label = Gtk.Label()
-        self._update_month_label()
+        self.month_label.set_markup(
+            f"<b>{datetime.date(self.year, self.month, 1).strftime('%B %Y').upper()}</b>"
+        )
         self.month_label.set_hexpand(True)
         self.month_label.add_css_class('calendar-title')
 
@@ -442,16 +442,10 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         self.calendar_card.append(hdr)
 
         self.grid_container = Gtk.Box()
+        self.grid_container.set_vexpand(True)
+        self.grid_container.set_hexpand(True)
         self.calendar_card.append(self.grid_container)
         self._build_grid()
-
-    def _update_month_label(self):
-        d = datetime.date(self.year, self.month, 1)
-        if self.is_compact:
-            fmt = f"<b>{d.strftime('%b %Y').upper()}</b>"
-        else:
-            fmt = f"<b>{d.strftime('%B %Y').upper()}</b>"
-        self.month_label.set_markup(fmt)
 
     def _build_grid(self):
         while True:
@@ -462,10 +456,12 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
 
         self._selected_btn = None
         grid = Gtk.Grid()
-        grid.set_row_spacing(2 if self.is_compact else 3)
-        grid.set_column_spacing(1 if self.is_compact else 2)
+        grid.set_row_spacing(4)
+        grid.set_column_spacing(4)
         grid.set_column_homogeneous(True)
+        grid.set_row_homogeneous(True)
         grid.set_hexpand(True)
+        grid.set_vexpand(True)
 
         day_names = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
         for col, name in enumerate(day_names):
@@ -473,7 +469,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
             lbl.add_css_class('weekday')
             if col >= 5:
                 lbl.add_css_class('weekend-label')
-            lbl.set_size_request(18 if self.is_compact else 28, 14 if self.is_compact else 16)
+            lbl.set_hexpand(True)
             grid.attach(lbl, col, 0, 1, 1)
 
         first = datetime.date(self.year, self.month, 1)
@@ -482,17 +478,16 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         weeks = math.ceil((first.weekday() + last.day) / 7)
         total_days = weeks * 7
 
-        cell_w = 19 if self.is_compact else 28
-        cell_h = 20 if self.is_compact else 25
-
         for i in range(total_days):
             date = start + datetime.timedelta(days=i)
             day_events = self.events.get(date.isoformat(), [])
 
             overlay = Gtk.Overlay()
-            overlay.set_size_request(cell_w, cell_h)
+            overlay.set_hexpand(True)
+            overlay.set_vexpand(True)
 
             number = Gtk.Label(label=str(date.day))
+            number.add_css_class('day-number')
             number.set_halign(Gtk.Align.CENTER)
             number.set_valign(Gtk.Align.CENTER)
             overlay.set_child(number)
@@ -501,26 +496,27 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
             has_tasks = any(isinstance(e, dict) and not e.get('done') for e in day_events)
 
             if has_events or has_tasks:
-                bar_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=1 if self.is_compact else 2)
+                bar_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=3)
                 bar_box.set_halign(Gtk.Align.CENTER)
                 bar_box.set_valign(Gtk.Align.END)
-                bar_box.set_margin_bottom(1 if self.is_compact else 2)
-                w = (5 if self.is_compact else 8) if (has_events and has_tasks) else (10 if self.is_compact else 16)
+                bar_box.set_margin_bottom(4)
+                w = 12 if (has_events and has_tasks) else 20
                 if has_tasks:
                     task_bar = Gtk.Box()
                     task_bar.add_css_class('task-bar')
-                    task_bar.set_size_request(w, 2)
+                    task_bar.set_size_request(w, 3)
                     bar_box.append(task_bar)
                 if has_events:
                     bar = Gtk.Box()
                     bar.add_css_class('event-bar')
-                    bar.set_size_request(w, 2)
+                    bar.set_size_request(w, 3)
                     bar_box.append(bar)
                 overlay.add_overlay(bar_box)
 
             btn = Gtk.Button()
             btn.set_child(overlay)
-            btn.set_size_request(cell_w, cell_h)
+            btn.set_hexpand(True)
+            btn.set_vexpand(True)
             btn.date = date
             btn.connect("clicked", self._on_day_clicked)
             btn.add_css_class("calendar-day-btn")
@@ -553,12 +549,14 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         self.year = self.today.year
         self.month = self.today.month
         self.selected_date = self.today
-        self._update_month_label()
+        self.month_label.set_markup(
+            f"<b>{datetime.date(self.year, self.month, 1).strftime('%B %Y').upper()}</b>"
+        )
         self._build_grid()
         self._update_agenda_card(self.today)
 
     def _build_agenda_card(self):
-        self.agenda_card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6 if self.is_compact else 8)
+        self.agenda_card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         self.agenda_card.add_css_class('desktop-card')
         self.agenda_card.add_css_class('agenda-card')
         self.agenda_card.set_vexpand(True)
@@ -577,10 +575,10 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         self.agenda_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
         scroll.set_child(self.agenda_box)
 
-        btn_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4 if self.is_compact else 6)
-        btn_row.set_size_request(-1, 28 if self.is_compact else 30)
+        btn_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        btn_row.set_size_request(-1, 30)
 
-        add_task_day_btn = Gtk.Button(label="+ Task" if self.is_compact else "+ Task for Today")
+        add_task_day_btn = Gtk.Button(label="+ Task for Today")
         add_task_day_btn.add_css_class('add-btn')
         add_task_day_btn.set_hexpand(True)
         add_task_day_btn.connect(
@@ -592,7 +590,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         cal_icon = Gtk.Label(label="\uf073")
         cal_icon.add_css_class('nerd')
         open_day_cal_btn.set_child(cal_icon)
-        open_day_cal_btn.set_size_request(24 if self.is_compact else 28, -1)
+        open_day_cal_btn.set_size_request(28, -1)
         open_day_cal_btn.add_css_class('add-btn')
         open_day_cal_btn.set_tooltip_text("Open day in Google Calendar")
         open_day_cal_btn.connect("clicked", self._on_open_day_cal_clicked)
@@ -605,9 +603,9 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
 
     def _update_agenda_card(self, date):
         if date == self.today:
-            heading = f"<b>Today</b> <span alpha='65%'>{date.strftime('%d %b')}</span>" if self.is_compact else f"<b>Today</b>  <span alpha='65%'>{date.strftime('%a, %d %b')}</span>"
+            heading = f"<b>Today</b>  <span alpha='65%'>{date.strftime('%a, %d %b')}</span>"
         else:
-            heading = f"<b>{date.strftime('%a')}</b> <span alpha='65%'>{date.strftime('%d %b')}</span>" if self.is_compact else f"<b>{date.strftime('%a')}</b>  <span alpha='65%'>{date.strftime('%d %b %Y')}</span>"
+            heading = f"<b>{date.strftime('%a')}</b>  <span alpha='65%'>{date.strftime('%d %b %Y')}</span>"
         self.agenda_hdr.set_markup(heading)
 
         while True:
@@ -1681,7 +1679,9 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         elif self.month > 12:
             self.month = 1
             self.year += 1
-        self._update_month_label()
+        self.month_label.set_markup(
+            f"<b>{datetime.date(self.year, self.month, 1).strftime('%B %Y').upper()}</b>"
+        )
         self._build_grid()
 
     def reload_data(self):
@@ -1690,7 +1690,9 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         self.current_theme = load_theme()
         self._update_clock()
         self._update_stats_pills()
-        self._update_month_label()
+        self.month_label.set_markup(
+            f"<b>{datetime.date(self.year, self.month, 1).strftime('%B %Y').upper()}</b>"
+        )
         self._build_grid()
         self._update_agenda_card(self.selected_date)
         self._populate_task_boards()
@@ -1705,19 +1707,15 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         """Live update layout when config.json changes."""
         self.config = load_config()
         self.cal_width = self._calc_calendar_width()
-        self.is_compact = (self.cal_width < 220)
-
-        if self.is_compact:
-            self.left_col.add_css_class('compact-calendar')
-        else:
-            self.left_col.remove_css_class('compact-calendar')
 
         self.left_col.set_size_request(self.cal_width, -1)
-        self.left_col.set_spacing(8 if self.is_compact else 10)
+        self.left_col.set_hexpand(False)
+        self.left_col.set_homogeneous(True)
 
         if hasattr(self, 'calendar_card'):
-            self.calendar_card.set_size_request(-1, 215 if self.is_compact else 260)
-            self.calendar_card.set_spacing(4 if self.is_compact else 6)
+            self.calendar_card.set_vexpand(True)
+        if hasattr(self, 'agenda_card'):
+            self.agenda_card.set_vexpand(True)
 
         fill_rest = self.config.get('task_panels_fill_rest', True)
         if hasattr(self, 'boards_box'):
@@ -2225,51 +2223,9 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
       .pulsing {{
           animation: pulse 0.6s ease-in-out infinite;
       }}
-      /* Compact Calendar Mode (Width <= 220px) */
-      .compact-calendar .desktop-card {{
-          padding: 6px 6px;
-      }}
-      .compact-calendar .calendar-card {{
-          padding: 6px 5px;
-      }}
-      .compact-calendar .agenda-card {{
-          padding: 6px 6px;
-      }}
-      .compact-calendar .calendar-title {{
-          font-size: 10px;
-          font-weight: bold;
-      }}
-      .compact-calendar .nav-btn {{
-          padding: 1px 3px;
-          font-size: 11px;
-      }}
-      .compact-calendar .pill-btn {{
-          padding: 1px 5px;
-          font-size: 9.5px;
-      }}
-      .compact-calendar .weekday {{
-          font-size: 9px;
-      }}
-      .compact-calendar button {{
-          font-size: 10px;
-      }}
-      .compact-calendar .calendar-day-btn {{
-          padding: 0px;
-          font-size: 9.5px;
-      }}
-      .compact-calendar .add-btn {{
-          padding: 2px 4px;
-          font-size: 9.5px;
-      }}
-      .compact-calendar .agenda-heading {{
-          font-size: 10.5px;
-      }}
-      .compact-calendar .event-name {{
-          font-size: 10.5px;
-      }}
-      .compact-calendar .done-toggle {{
-          padding: 0px 4px;
-          font-size: 9px;
+      .day-number {{
+          font-size: 13px;
+          font-weight: 500;
       }}
       """.encode()
 
