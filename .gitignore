@@ -2,7 +2,15 @@ credentials.json
 client_secret*.json
 *.pid
 __pycache__/
-screenshot*
+
+# Ignore root-level / stray screenshots and images
+/screenshot*
 *.png
 *.jpg
 *.jpeg
+
+# Track reference screenshots
+!screenshots/
+!screenshots/*.png
+!screenshots/*.jpg
+!screenshots/*.jpeg
