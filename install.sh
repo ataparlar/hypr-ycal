@@ -4,7 +4,7 @@ set -euo pipefail
 DEST_DIR="$HOME/.config/waybar-ycal"
 SYSTEMD_USER_DIR="$HOME/.config/systemd/user"
 
-echo "=== Installing Waybar Ycal Suite ==="
+echo "=== Installing hypr-ycal Suite ==="
 
 # Create directories
 mkdir -p "$DEST_DIR/themes"

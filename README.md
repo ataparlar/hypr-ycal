@@ -1,4 +1,4 @@
-# Waybar Ycal + Hyprland Background Task Manager
+# hypr-ycal
 
 An interactive desktop productivity suite for **Wayland / Hyprland** and **Waybar**, combining a persistent desktop background dashboard with a fast top-layer Waybar popup.
 
@@ -66,8 +66,8 @@ A [Nerd Font](https://www.nerdfonts.com/) (e.g., JetBrainsMono Nerd Font) is rec
 Clone this repository and run the installer script:
 
 ```bash
-git clone https://github.com/ataparlar/waybar-ycal.git
-cd waybar-ycal
+git clone https://github.com/ataparlar/hypr-ycal.git
+cd hypr-ycal
 ./install.sh
 ```
 
