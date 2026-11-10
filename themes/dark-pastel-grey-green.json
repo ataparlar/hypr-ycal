@@ -1,0 +1,75 @@
+{
+  "name": "dark-pastel-grey-green",
+  "display_name": "Dark Pastel Grey-Green (Waybar Match)",
+  "desktop_bg": "linear-gradient(135deg, rgba(22, 27, 25, 0.94), rgba(18, 22, 20, 0.94))",
+  "desktop_border": "rgba(255, 255, 255, 0.08)",
+  "card_bg": "rgba(33, 40, 37, 0.90)",
+  "card_border": "rgba(255, 255, 255, 0.06)",
+  "dialog_bg": "rgba(28, 34, 31, 0.98)",
+  "text_fg": "#d8deda",
+  "text_muted": "rgba(216, 222, 218, 0.5)",
+  "accent": "#94baa6",
+  "today_bg": "#44544d",
+  "today_fg": "#e8efe9",
+  "today_border": "rgba(148, 186, 166, 0.35)",
+  "save_btn_bg": "#44544d",
+  "save_btn_hover": "#50635b",
+  "column_themes": [
+    {
+      "name": "sage",
+      "color": "#94baa6",
+      "grad": "linear-gradient(90deg, #94baa6, #6b8f7d)",
+      "bg_card": "rgba(33, 40, 37, 0.90)",
+      "border": "rgba(148, 186, 166, 0.35)",
+      "badge_bg": "rgba(148, 186, 166, 0.16)"
+    },
+    {
+      "name": "peach",
+      "color": "#caa08c",
+      "grad": "linear-gradient(90deg, #caa08c, #a87e6b)",
+      "bg_card": "rgba(33, 40, 37, 0.90)",
+      "border": "rgba(202, 160, 140, 0.35)",
+      "badge_bg": "rgba(202, 160, 140, 0.16)"
+    },
+    {
+      "name": "linen",
+      "color": "#cfb989",
+      "grad": "linear-gradient(90deg, #cfb989, #ad9868)",
+      "bg_card": "rgba(33, 40, 37, 0.90)",
+      "border": "rgba(207, 185, 137, 0.35)",
+      "badge_bg": "rgba(207, 185, 137, 0.16)"
+    },
+    {
+      "name": "celadon",
+      "color": "#86b3a8",
+      "grad": "linear-gradient(90deg, #86b3a8, #659187)",
+      "bg_card": "rgba(33, 40, 37, 0.90)",
+      "border": "rgba(134, 179, 168, 0.35)",
+      "badge_bg": "rgba(134, 179, 168, 0.16)"
+    },
+    {
+      "name": "rose",
+      "color": "#c97f88",
+      "grad": "linear-gradient(90deg, #c97f88, #a85f68)",
+      "bg_card": "rgba(33, 40, 37, 0.90)",
+      "border": "rgba(201, 127, 136, 0.35)",
+      "badge_bg": "rgba(201, 127, 136, 0.16)"
+    },
+    {
+      "name": "slate",
+      "color": "#82a4b8",
+      "grad": "linear-gradient(90deg, #82a4b8, #638396)",
+      "bg_card": "rgba(33, 40, 37, 0.90)",
+      "border": "rgba(130, 164, 184, 0.35)",
+      "badge_bg": "rgba(130, 164, 184, 0.16)"
+    },
+    {
+      "name": "denim",
+      "color": "#8ea0b5",
+      "grad": "linear-gradient(90deg, #8ea0b5, #6c7f94)",
+      "bg_card": "rgba(33, 40, 37, 0.90)",
+      "border": "rgba(142, 160, 181, 0.35)",
+      "badge_bg": "rgba(142, 160, 181, 0.16)"
+    }
+  ]
+}

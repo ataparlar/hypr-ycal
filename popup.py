@@ -208,11 +208,25 @@ def sync_in_background():
     threading.Thread(target=_run_sync, daemon=True).start()
     return True  # Keep GLib timer repeating
 
+CURRENT_THEME_FILE = os.path.expanduser('~/.config/waybar-ycal/current_theme.json')
+
 def load_theme():
+    if os.path.exists(CURRENT_THEME_FILE):
+        try:
+            with open(CURRENT_THEME_FILE, 'r') as f:
+                d = json.load(f)
+                return {
+                    'foreground': d.get('text_fg', '#d8deda'),
+                    'background': '#1b221f',
+                    'accent': d.get('accent', '#94baa6'),
+                    **d
+                }
+        except Exception:
+            pass
     defaults = {
-        'foreground': '#ffcead',
-        'background': '#060B1E',
-        'accent': '#7d82d9',
+        'foreground': '#d8deda',
+        'background': '#1b221f',
+        'accent': '#94baa6',
     }
     try:
         with open(THEME_FILE, 'rb') as f:

@@ -1,0 +1,75 @@
+{
+  "name": "catppuccin-mocha",
+  "display_name": "Catppuccin Mocha",
+  "desktop_bg": "linear-gradient(155deg, rgba(11, 15, 25, 0.94) 0%, rgba(17, 24, 39, 0.94) 50%, rgba(15, 23, 42, 0.94) 100%)",
+  "desktop_border": "rgba(168, 85, 247, 0.22)",
+  "card_bg": "linear-gradient(180deg, rgba(17, 24, 39, 0.92) 0%, rgba(15, 20, 32, 0.92) 100%)",
+  "card_border": "rgba(148, 163, 184, 0.20)",
+  "dialog_bg": "linear-gradient(155deg, #111827 0%, #1e1b4b 100%)",
+  "text_fg": "#cdd6f4",
+  "text_muted": "rgba(205, 214, 244, 0.55)",
+  "accent": "#cba6f7",
+  "today_bg": "linear-gradient(135deg, #7c3aed, #6366f1)",
+  "today_fg": "#ffffff",
+  "today_border": "rgba(124, 58, 237, 0.50)",
+  "save_btn_bg": "linear-gradient(135deg, #a855f7, #6366f1)",
+  "save_btn_hover": "linear-gradient(135deg, #b86bfc, #7579f3)",
+  "column_themes": [
+    {
+      "name": "mauve",
+      "color": "#cba6f7",
+      "grad": "linear-gradient(90deg, #cba6f7, #a855f7)",
+      "bg_card": "linear-gradient(180deg, rgba(26, 21, 38, 0.93) 0%, rgba(17, 16, 28, 0.93) 100%)",
+      "border": "rgba(203, 166, 247, 0.35)",
+      "badge_bg": "rgba(203, 166, 247, 0.18)"
+    },
+    {
+      "name": "peach",
+      "color": "#fab387",
+      "grad": "linear-gradient(90deg, #fab387, #f97316)",
+      "bg_card": "linear-gradient(180deg, rgba(34, 25, 22, 0.93) 0%, rgba(20, 17, 18, 0.93) 100%)",
+      "border": "rgba(250, 179, 135, 0.35)",
+      "badge_bg": "rgba(250, 179, 135, 0.18)"
+    },
+    {
+      "name": "mint",
+      "color": "#a6e3a1",
+      "grad": "linear-gradient(90deg, #a6e3a1, #10b981)",
+      "bg_card": "linear-gradient(180deg, rgba(20, 32, 26, 0.93) 0%, rgba(15, 22, 19, 0.93) 100%)",
+      "border": "rgba(166, 227, 161, 0.35)",
+      "badge_bg": "rgba(166, 227, 161, 0.18)"
+    },
+    {
+      "name": "cyan",
+      "color": "#74c7ec",
+      "grad": "linear-gradient(90deg, #74c7ec, #06b6d4)",
+      "bg_card": "linear-gradient(180deg, rgba(18, 28, 38, 0.93) 0%, rgba(14, 19, 28, 0.93) 100%)",
+      "border": "rgba(116, 199, 236, 0.35)",
+      "badge_bg": "rgba(116, 199, 236, 0.18)"
+    },
+    {
+      "name": "rose",
+      "color": "#f38ba8",
+      "grad": "linear-gradient(90deg, #f38ba8, #ec4899)",
+      "bg_card": "linear-gradient(180deg, rgba(35, 20, 28, 0.93) 0%, rgba(22, 15, 20, 0.93) 100%)",
+      "border": "rgba(243, 139, 168, 0.35)",
+      "badge_bg": "rgba(243, 139, 168, 0.18)"
+    },
+    {
+      "name": "lavender",
+      "color": "#b4befe",
+      "grad": "linear-gradient(90deg, #b4befe, #818cf8)",
+      "bg_card": "linear-gradient(180deg, rgba(23, 24, 40, 0.93) 0%, rgba(16, 17, 28, 0.93) 100%)",
+      "border": "rgba(180, 190, 254, 0.35)",
+      "badge_bg": "rgba(180, 190, 254, 0.18)"
+    },
+    {
+      "name": "teal",
+      "color": "#94e2d5",
+      "grad": "linear-gradient(90deg, #94e2d5, #14b8a6)",
+      "bg_card": "linear-gradient(180deg, rgba(18, 32, 32, 0.93) 0%, rgba(14, 22, 22, 0.93) 100%)",
+      "border": "rgba(148, 226, 213, 0.35)",
+      "badge_bg": "rgba(148, 226, 213, 0.18)"
+    }
+  ]
+}

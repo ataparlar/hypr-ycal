@@ -39,66 +39,94 @@ from popup import (
 
 BG_PID_FILE = os.path.expanduser('~/.cache/waybar-ycal/bg.pid')
 SYNC_INTERVAL_SEC = 15 * 60  # 15 minutes
+CURRENT_THEME_FILE = os.path.expanduser('~/.config/waybar-ycal/current_theme.json')
 
-# Vibrant themes for task list columns (clean grey card, distinct accent colors)
-LIST_THEMES = [
-    {
-        'name': 'sky',
-        'color': '#38bdf8',
-        'grad': 'linear-gradient(90deg, #38bdf8, #0284c7)',
-        'bg_card': 'rgba(48, 52, 60, 0.90)',
-        'border': 'rgba(56, 189, 248, 0.35)',
-        'badge_bg': 'rgba(56, 189, 248, 0.16)',
-    },
-    {
-        'name': 'peach',
-        'color': '#fab387',
-        'grad': 'linear-gradient(90deg, #fab387, #ea580c)',
-        'bg_card': 'rgba(48, 52, 60, 0.90)',
-        'border': 'rgba(250, 179, 135, 0.35)',
-        'badge_bg': 'rgba(250, 179, 135, 0.16)',
-    },
-    {
-        'name': 'mint',
-        'color': '#a6e3a1',
-        'grad': 'linear-gradient(90deg, #a6e3a1, #059669)',
-        'bg_card': 'rgba(48, 52, 60, 0.90)',
-        'border': 'rgba(166, 227, 161, 0.35)',
-        'badge_bg': 'rgba(166, 227, 161, 0.16)',
-    },
-    {
-        'name': 'cyan',
-        'color': '#74c7ec',
-        'grad': 'linear-gradient(90deg, #74c7ec, #0891b2)',
-        'bg_card': 'rgba(48, 52, 60, 0.90)',
-        'border': 'rgba(116, 199, 236, 0.35)',
-        'badge_bg': 'rgba(116, 199, 236, 0.16)',
-    },
-    {
-        'name': 'rose',
-        'color': '#f38ba8',
-        'grad': 'linear-gradient(90deg, #f38ba8, #e11d48)',
-        'bg_card': 'rgba(48, 52, 60, 0.90)',
-        'border': 'rgba(243, 139, 168, 0.35)',
-        'badge_bg': 'rgba(243, 139, 168, 0.16)',
-    },
-    {
-        'name': 'amber',
-        'color': '#fbbf24',
-        'grad': 'linear-gradient(90deg, #fbbf24, #d97706)',
-        'bg_card': 'rgba(48, 52, 60, 0.90)',
-        'border': 'rgba(251, 191, 36, 0.35)',
-        'badge_bg': 'rgba(251, 191, 36, 0.16)',
-    },
-    {
-        'name': 'teal',
-        'color': '#94e2d5',
-        'grad': 'linear-gradient(90deg, #94e2d5, #0d9488)',
-        'bg_card': 'rgba(48, 52, 60, 0.90)',
-        'border': 'rgba(148, 226, 213, 0.35)',
-        'badge_bg': 'rgba(148, 226, 213, 0.16)',
-    },
-]
+DEFAULT_THEME = {
+    "name": "dark-pastel-grey-green",
+    "display_name": "Dark Pastel Grey-Green",
+    "desktop_bg": "linear-gradient(135deg, rgba(22, 27, 25, 0.94), rgba(18, 22, 20, 0.94))",
+    "desktop_border": "rgba(255, 255, 255, 0.08)",
+    "card_bg": "rgba(33, 40, 37, 0.90)",
+    "card_border": "rgba(255, 255, 255, 0.06)",
+    "dialog_bg": "rgba(28, 34, 31, 0.98)",
+    "text_fg": "#d8deda",
+    "text_muted": "rgba(216, 222, 218, 0.5)",
+    "accent": "#94baa6",
+    "today_bg": "#44544d",
+    "today_fg": "#e8efe9",
+    "today_border": "rgba(148, 186, 166, 0.35)",
+    "save_btn_bg": "#44544d",
+    "save_btn_hover": "#50635b",
+    "column_themes": [
+        {
+            "name": "sage",
+            "color": "#94baa6",
+            "grad": "linear-gradient(90deg, #94baa6, #6b8f7d)",
+            "bg_card": "rgba(33, 40, 37, 0.90)",
+            "border": "rgba(148, 186, 166, 0.35)",
+            "badge_bg": "rgba(148, 186, 166, 0.16)",
+        },
+        {
+            "name": "peach",
+            "color": "#caa08c",
+            "grad": "linear-gradient(90deg, #caa08c, #a87e6b)",
+            "bg_card": "rgba(33, 40, 37, 0.90)",
+            "border": "rgba(202, 160, 140, 0.35)",
+            "badge_bg": "rgba(202, 160, 140, 0.16)",
+        },
+        {
+            "name": "linen",
+            "color": "#cfb989",
+            "grad": "linear-gradient(90deg, #cfb989, #ad9868)",
+            "bg_card": "rgba(33, 40, 37, 0.90)",
+            "border": "rgba(207, 185, 137, 0.35)",
+            "badge_bg": "rgba(207, 185, 137, 0.16)",
+        },
+        {
+            "name": "celadon",
+            "color": "#86b3a8",
+            "grad": "linear-gradient(90deg, #86b3a8, #659187)",
+            "bg_card": "rgba(33, 40, 37, 0.90)",
+            "border": "rgba(134, 179, 168, 0.35)",
+            "badge_bg": "rgba(134, 179, 168, 0.16)",
+        },
+        {
+            "name": "rose",
+            "color": "#c97f88",
+            "grad": "linear-gradient(90deg, #c97f88, #a85f68)",
+            "bg_card": "rgba(33, 40, 37, 0.90)",
+            "border": "rgba(201, 127, 136, 0.35)",
+            "badge_bg": "rgba(201, 127, 136, 0.16)",
+        },
+        {
+            "name": "slate",
+            "color": "#82a4b8",
+            "grad": "linear-gradient(90deg, #82a4b8, #638396)",
+            "bg_card": "rgba(33, 40, 37, 0.90)",
+            "border": "rgba(130, 164, 184, 0.35)",
+            "badge_bg": "rgba(130, 164, 184, 0.16)",
+        },
+        {
+            "name": "denim",
+            "color": "#8ea0b5",
+            "grad": "linear-gradient(90deg, #8ea0b5, #6c7f94)",
+            "bg_card": "rgba(33, 40, 37, 0.90)",
+            "border": "rgba(142, 160, 181, 0.35)",
+            "badge_bg": "rgba(142, 160, 181, 0.16)",
+        },
+    ]
+}
+
+
+def load_theme():
+    if os.path.exists(CURRENT_THEME_FILE):
+        try:
+            with open(CURRENT_THEME_FILE, 'r') as f:
+                data = json.load(f)
+                return {**DEFAULT_THEME, **data}
+        except Exception as e:
+            print(f"[load_theme error] {e}", file=sys.stderr)
+    return DEFAULT_THEME
 
 
 class DesktopBackgroundWindow(Gtk.ApplicationWindow):
@@ -111,6 +139,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         self.month = self.today.month
         self.selected_date = self.today
         self.events, self.task_lists = load_data()
+        self.current_theme = load_theme()
 
         self._selected_btn = None
         self._collapsed_parents = set()
@@ -613,8 +642,9 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
             self.boards_box.append(empty)
             return
 
+        col_themes = self.current_theme.get('column_themes') or DEFAULT_THEME['column_themes']
         for idx, tl in enumerate(self.task_lists):
-            theme = LIST_THEMES[idx % len(LIST_THEMES)]
+            theme = col_themes[idx % len(col_themes)]
 
             col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
             col.set_size_request(275, -1)
@@ -767,11 +797,11 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
                 today = datetime.date.today()
                 time_str = f" {due_time}" if due_time else ""
                 if d_obj == today:
-                    due_badge = f"<span foreground='#fab387' size='small'>Today{time_str}</span>"
+                    due_badge = f"<span foreground='#caa08c' size='small'>Today{time_str}</span>"
                 elif d_obj < today and not done:
-                    due_badge = f"<span foreground='#f38ba8' weight='bold' size='small'>{d_obj.strftime('%d %b')}{time_str}</span>"
+                    due_badge = f"<span foreground='#c97f88' weight='bold' size='small'>{d_obj.strftime('%d %b')}{time_str}</span>"
                 else:
-                    due_badge = f"<span foreground='#a6e3a1' size='small'>{d_obj.strftime('%d %b')}{time_str}</span>"
+                    due_badge = f"<span foreground='#94baa6' size='small'>{d_obj.strftime('%d %b')}{time_str}</span>"
             except Exception:
                 due_badge = ""
 
@@ -1566,28 +1596,50 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
     def reload_data(self):
         """Reload events and task lists from disk cache and re-render."""
         self.events, self.task_lists = load_data()
+        self.current_theme = load_theme()
         self._update_clock()
         self._update_stats_pills()
         self._build_grid()
         self._update_agenda_card(self.selected_date)
         self._populate_task_boards()
 
+    def reload_theme(self):
+        """Reload theme settings and re-apply styling."""
+        self.current_theme = load_theme()
+        self._apply_css()
+        self.reload_data()
+
     def _apply_css(self):
-        t = load_theme()
-        fg = '#e2e8f0'
-        accent = '#38bdf8'
-        red = '#f43f5e'
+        th = getattr(self, 'current_theme', None) or load_theme()
+        fg = th.get('text_fg', '#d8deda')
+        accent = th.get('accent', '#94baa6')
+        red = '#c97f88'
         self._refresh_fg = hex_to_rgb_float(fg)
+
+        col_css_lines = []
+        for cth in th.get('column_themes', []):
+            col_css_lines.append(f"""
+      /* Theme: {cth['name']} */
+      .kanban-theme-{cth['name']} {{
+          background: {cth['bg_card']};
+          border: 1px solid {cth['border']};
+      }}
+      .accent-bg-{cth['name']} {{ background: {cth['grad']}; }}
+      .badge-{cth['name']} {{ background: {cth['badge_bg']}; color: {cth['color']}; border: 1px solid {cth['border']}; }}
+      .btn-{cth['name']} {{ background: {cth['badge_bg']}; color: {cth['color']}; }}
+      .footer-btn-{cth['name']} {{ background: {cth['badge_bg']}; color: {cth['color']}; border-color: {cth['border']}; }}
+""")
+        column_styles = "\n".join(col_css_lines)
 
         css = f"""
       window {{
           background: transparent;
       }}
-      /* Clean, plain, not-heavy grey backdrop for desktop */
+      /* Desktop background canvas */
       .desktop-bg {{
-          background: rgba(38, 41, 47, 0.88);
+          background: {th.get('desktop_bg', 'linear-gradient(135deg, rgba(22, 27, 25, 0.94), rgba(18, 22, 20, 0.94))')};
           border-radius: 16px;
-          border: 1px solid rgba(255, 255, 255, 0.12);
+          border: 1px solid {th.get('desktop_border', 'rgba(255, 255, 255, 0.08)')};
           padding: 8px 12px;
       }}
       .desktop-card {{
@@ -1595,28 +1647,28 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           padding: 10px;
       }}
       .desktop-header-card {{
-          background: rgba(48, 52, 60, 0.90);
-          border: 1px solid rgba(255, 255, 255, 0.10);
+          background: {th.get('card_bg', 'rgba(33, 40, 37, 0.90)')};
+          border: 1px solid {th.get('card_border', 'rgba(255, 255, 255, 0.06)')};
           border-radius: 12px;
           padding: 6px 14px;
       }}
       .calendar-card {{
-          background: rgba(48, 52, 60, 0.90);
-          border: 1px solid rgba(255, 255, 255, 0.10);
+          background: {th.get('card_bg', 'rgba(33, 40, 37, 0.90)')};
+          border: 1px solid {th.get('card_border', 'rgba(255, 255, 255, 0.06)')};
       }}
       .agenda-card {{
-          background: rgba(48, 52, 60, 0.90);
-          border: 1px solid rgba(255, 255, 255, 0.10);
+          background: {th.get('card_bg', 'rgba(33, 40, 37, 0.90)')};
+          border: 1px solid {th.get('card_border', 'rgba(255, 255, 255, 0.06)')};
       }}
       .header-date {{
           font-size: 13px;
           font-weight: bold;
-          color: #f8fafc;
+          color: {th.get('text_fg', '#d8deda')};
       }}
       .header-clock {{
           font-size: 13px;
           font-family: monospace;
-          color: #94a3b8;
+          color: {th.get('accent', '#94baa6')};
           font-weight: bold;
       }}
       .status-pill {{
@@ -1626,19 +1678,19 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           font-weight: 500;
       }}
       .pill-due {{
-          border: 1px solid rgba(250, 179, 135, 0.4);
-          background: rgba(250, 179, 135, 0.15);
-          color: #fab387;
+          border: 1px solid rgba(202, 160, 140, 0.35);
+          background: rgba(202, 160, 140, 0.16);
+          color: #caa08c;
       }}
       .pill-pending {{
-          border: 1px solid rgba(255, 255, 255, 0.18);
-          background: rgba(255, 255, 255, 0.08);
-          color: #e2e8f0;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          background: rgba(255, 255, 255, 0.07);
+          color: {th.get('text_fg', '#d8deda')};
       }}
       .pill-lists {{
-          border: 1px solid rgba(116, 199, 236, 0.4);
-          background: rgba(116, 199, 236, 0.15);
-          color: #74c7ec;
+          border: 1px solid rgba(130, 164, 184, 0.35);
+          background: rgba(130, 164, 184, 0.16);
+          color: #82a4b8;
       }}
       button {{
           background: transparent;
@@ -1664,43 +1716,44 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
       }}
       .action-btn {{
           background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.14);
+          border: 1px solid rgba(255, 255, 255, 0.12);
           border-radius: 8px;
-          color: #e2e8f0;
+          color: {fg};
           font-size: 11px;
           padding: 4px 10px;
       }}
       .action-btn:hover {{
           background: rgba(255, 255, 255, 0.12);
-          border-color: rgba(255, 255, 255, 0.25);
+          border-color: rgba(255, 255, 255, 0.22);
       }}
       .action-btn-primary {{
-          background: #3b82f6;
-          border: 1px solid #60a5fa;
+          background: {th.get('save_btn_bg', '#44544d')};
+          border: 1px solid {th.get('today_border', 'rgba(148, 186, 166, 0.35)')};
           border-radius: 8px;
-          color: #ffffff;
+          color: {th.get('today_fg', '#e8efe9')};
           font-weight: bold;
           font-size: 11px;
           padding: 4px 12px;
+          box-shadow: none;
       }}
       .action-btn-primary:hover {{
-          background: #2563eb;
+          background: {th.get('save_btn_hover', '#50635b')};
       }}
       .calendar-title {{
           font-size: 11px;
           font-weight: bold;
-          color: #e2e8f0;
+          color: {fg};
       }}
       .nav-btn {{
           padding: 1px 6px;
           font-size: 13px;
-          color: rgba(226, 232, 240, 0.75);
+          color: rgba(216, 222, 218, 0.7);
       }}
       .nav-btn:hover {{
           color: #ffffff;
       }}
       .weekday {{
-          color: rgba(226, 232, 240, 0.45);
+          color: rgba(216, 222, 218, 0.45);
           font-size: 10px;
           font-weight: 600;
       }}
@@ -1712,38 +1765,40 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           border-radius: 6px;
       }}
       .weekend-label {{
-          color: #94a3b8;
+          color: #9aa6a0;
       }}
       .today {{
-          background: #3b82f6;
+          background: {th.get('today_bg', '#44544d')};
+          border: 1px solid {th.get('today_border', 'rgba(148, 186, 166, 0.35)')};
           border-radius: 6px;
           font-weight: bold;
-          color: #ffffff;
+          color: {th.get('today_fg', '#e8efe9')};
+          box-shadow: none;
       }}
       .today:hover {{
-          background: #2563eb;
+          background: {th.get('save_btn_hover', '#50635b')};
       }}
       .selected {{
-          border: 2px solid #38bdf8;
+          border: 2px solid {accent};
           border-radius: 6px;
       }}
       .today.selected {{
           border: 2px solid #ffffff;
       }}
       .event-bar {{
-          background: #38bdf8;
+          background: {accent};
           border-radius: 2px;
           min-height: 2px;
       }}
       .task-bar {{
-          background: #f59e0b;
+          background: #caa08c;
           border-radius: 2px;
           min-height: 2px;
       }}
       .agenda-heading {{
           font-size: 11.5px;
           margin-bottom: 2px;
-          color: #f1f5f9;
+          color: {fg};
       }}
       .agenda-row {{
           background: rgba(255, 255, 255, 0.035);
@@ -1752,19 +1807,19 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           padding: 3px 6px;
       }}
       .event-dot {{
-          color: #38bdf8;
+          color: {accent};
           font-size: 10px;
       }}
       .event-name {{
           font-size: 11px;
-          color: #f1f5f9;
+          color: {fg};
       }}
       .task-dot {{
-          color: #f59e0b;
+          color: #caa08c;
           font-size: 10px;
       }}
       .done-dot {{
-          color: #10b981;
+          color: #94baa6;
           font-size: 10px;
       }}
       .done-toggle {{
@@ -1779,24 +1834,24 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           color: transparent;
       }}
       .done-toggle-inactive:hover {{
-          border-color: #10b981;
-          color: #10b981;
+          border-color: #94baa6;
+          color: #94baa6;
       }}
       .done-toggle-active {{
-          border: 1px solid #10b981;
-          color: #10b981;
-          background: rgba(16, 185, 129, 0.18);
+          border: 1px solid #94baa6;
+          color: #94baa6;
+          background: rgba(148, 186, 166, 0.2);
       }}
       .no-events {{
           font-size: 11px;
-          color: rgba(226, 232, 240, 0.4);
+          color: rgba(216, 222, 218, 0.4);
           font-style: italic;
       }}
       .add-btn {{
           background: rgba(255, 255, 255, 0.06);
           border: 1px solid rgba(255, 255, 255, 0.12);
           border-radius: 6px;
-          color: #e2e8f0;
+          color: {fg};
           font-size: 10.5px;
           padding: 3px 0;
       }}
@@ -1807,7 +1862,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
       /* ── Kanban Column Themes ──────────────────────────────── */
       .kanban-column {{
           padding: 8px 10px 10px 10px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
       }}
       .kanban-top-bar {{
           border-radius: 3px;
@@ -1832,109 +1887,41 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           font-weight: bold;
       }}
       .task-item-card {{
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.07);
+          background: rgba(255, 255, 255, 0.035);
+          border: 1px solid rgba(255, 255, 255, 0.06);
           border-radius: 7px;
           padding: 3px 6px;
       }}
       .task-item-card:hover {{
           background: rgba(255, 255, 255, 0.07);
-          border-color: rgba(255, 255, 255, 0.14);
+          border-color: rgba(255, 255, 255, 0.12);
       }}
 
-      /* Theme: Sky */
-      .kanban-theme-sky {{
-          background: {LIST_THEMES[0]['bg_card']};
-          border: 1px solid {LIST_THEMES[0]['border']};
-      }}
-      .accent-bg-sky {{ background: {LIST_THEMES[0]['grad']}; }}
-      .badge-sky {{ background: {LIST_THEMES[0]['badge_bg']}; color: {LIST_THEMES[0]['color']}; border: 1px solid rgba(56, 189, 248, 0.35); }}
-      .btn-sky {{ background: {LIST_THEMES[0]['badge_bg']}; color: {LIST_THEMES[0]['color']}; }}
-      .footer-btn-sky {{ background: {LIST_THEMES[0]['badge_bg']}; color: {LIST_THEMES[0]['color']}; border-color: rgba(56, 189, 248, 0.3); }}
-
-      /* Theme: Peach */
-      .kanban-theme-peach {{
-          background: {LIST_THEMES[1]['bg_card']};
-          border: 1px solid {LIST_THEMES[1]['border']};
-      }}
-      .accent-bg-peach {{ background: {LIST_THEMES[1]['grad']}; }}
-      .badge-peach {{ background: {LIST_THEMES[1]['badge_bg']}; color: {LIST_THEMES[1]['color']}; border: 1px solid rgba(250, 179, 135, 0.35); }}
-      .btn-peach {{ background: {LIST_THEMES[1]['badge_bg']}; color: {LIST_THEMES[1]['color']}; }}
-      .footer-btn-peach {{ background: {LIST_THEMES[1]['badge_bg']}; color: {LIST_THEMES[1]['color']}; border-color: rgba(250, 179, 135, 0.3); }}
-
-      /* Theme: Mint */
-      .kanban-theme-mint {{
-          background: {LIST_THEMES[2]['bg_card']};
-          border: 1px solid {LIST_THEMES[2]['border']};
-      }}
-      .accent-bg-mint {{ background: {LIST_THEMES[2]['grad']}; }}
-      .badge-mint {{ background: {LIST_THEMES[2]['badge_bg']}; color: {LIST_THEMES[2]['color']}; border: 1px solid rgba(166, 227, 161, 0.35); }}
-      .btn-mint {{ background: {LIST_THEMES[2]['badge_bg']}; color: {LIST_THEMES[2]['color']}; }}
-      .footer-btn-mint {{ background: {LIST_THEMES[2]['badge_bg']}; color: {LIST_THEMES[2]['color']}; border-color: rgba(166, 227, 161, 0.3); }}
-
-      /* Theme: Cyan */
-      .kanban-theme-cyan {{
-          background: {LIST_THEMES[3]['bg_card']};
-          border: 1px solid {LIST_THEMES[3]['border']};
-      }}
-      .accent-bg-cyan {{ background: {LIST_THEMES[3]['grad']}; }}
-      .badge-cyan {{ background: {LIST_THEMES[3]['badge_bg']}; color: {LIST_THEMES[3]['color']}; border: 1px solid rgba(116, 199, 236, 0.35); }}
-      .btn-cyan {{ background: {LIST_THEMES[3]['badge_bg']}; color: {LIST_THEMES[3]['color']}; }}
-      .footer-btn-cyan {{ background: {LIST_THEMES[3]['badge_bg']}; color: {LIST_THEMES[3]['color']}; border-color: rgba(116, 199, 236, 0.3); }}
-
-      /* Theme: Rose */
-      .kanban-theme-rose {{
-          background: {LIST_THEMES[4]['bg_card']};
-          border: 1px solid {LIST_THEMES[4]['border']};
-      }}
-      .accent-bg-rose {{ background: {LIST_THEMES[4]['grad']}; }}
-      .badge-rose {{ background: {LIST_THEMES[4]['badge_bg']}; color: {LIST_THEMES[4]['color']}; border: 1px solid rgba(243, 139, 168, 0.35); }}
-      .btn-rose {{ background: {LIST_THEMES[4]['badge_bg']}; color: {LIST_THEMES[4]['color']}; }}
-      .footer-btn-rose {{ background: {LIST_THEMES[4]['badge_bg']}; color: {LIST_THEMES[4]['color']}; border-color: rgba(243, 139, 168, 0.3); }}
-
-      /* Theme: Amber */
-      .kanban-theme-amber {{
-          background: {LIST_THEMES[5]['bg_card']};
-          border: 1px solid {LIST_THEMES[5]['border']};
-      }}
-      .accent-bg-amber {{ background: {LIST_THEMES[5]['grad']}; }}
-      .badge-amber {{ background: {LIST_THEMES[5]['badge_bg']}; color: {LIST_THEMES[5]['color']}; border: 1px solid rgba(251, 191, 36, 0.35); }}
-      .btn-amber {{ background: {LIST_THEMES[5]['badge_bg']}; color: {LIST_THEMES[5]['color']}; }}
-      .footer-btn-amber {{ background: {LIST_THEMES[5]['badge_bg']}; color: {LIST_THEMES[5]['color']}; border-color: rgba(251, 191, 36, 0.3); }}
-
-      /* Theme: Teal */
-      .kanban-theme-teal {{
-          background: {LIST_THEMES[6]['bg_card']};
-          border: 1px solid {LIST_THEMES[6]['border']};
-      }}
-      .accent-bg-teal {{ background: {LIST_THEMES[6]['grad']}; }}
-      .badge-teal {{ background: {LIST_THEMES[6]['badge_bg']}; color: {LIST_THEMES[6]['color']}; border: 1px solid rgba(148, 226, 213, 0.35); }}
-      .btn-teal {{ background: {LIST_THEMES[6]['badge_bg']}; color: {LIST_THEMES[6]['color']}; }}
-      .footer-btn-teal {{ background: {LIST_THEMES[6]['badge_bg']}; color: {LIST_THEMES[6]['color']}; border-color: rgba(148, 226, 213, 0.3); }}
+{column_styles}
 
       /* ── Due Badges ────────────────────────────────────────── */
       .due-today {{
-          background: rgba(250, 179, 135, 0.22);
-          color: #fab387;
-          border: 1px solid rgba(250, 179, 135, 0.45);
+          background: rgba(202, 160, 140, 0.22);
+          color: #caa08c;
+          border: 1px solid rgba(202, 160, 140, 0.45);
           border-radius: 4px;
           padding: 1px 4px;
           font-size: 8.5pt;
           font-weight: bold;
       }}
       .due-overdue {{
-          background: rgba(243, 139, 168, 0.22);
-          color: #f38ba8;
-          border: 1px solid rgba(243, 139, 168, 0.45);
+          background: rgba(201, 127, 136, 0.22);
+          color: #c97f88;
+          border: 1px solid rgba(201, 127, 136, 0.45);
           border-radius: 4px;
           padding: 1px 4px;
           font-size: 8.5pt;
           font-weight: bold;
       }}
       .due-future {{
-          background: rgba(116, 199, 236, 0.16);
-          color: #74c7ec;
-          border: 1px solid rgba(116, 199, 236, 0.3);
+          background: rgba(148, 186, 166, 0.18);
+          color: #94baa6;
+          border: 1px solid rgba(148, 186, 166, 0.35);
           border-radius: 4px;
           padding: 1px 4px;
           font-size: 8.5pt;
@@ -1945,7 +1932,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           background: rgba(255, 255, 255, 0.05);
           border: 1px solid rgba(255, 255, 255, 0.12);
           border-radius: 6px;
-          color: #e2e8f0;
+          color: {fg};
           font-size: 10.5px;
           padding: 3px 0;
       }}
@@ -1956,12 +1943,12 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           background: rgba(255, 255, 255, 0.08);
           border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 6px;
-          color: #f8fafc;
+          color: {fg};
           font-size: 11px;
           padding: 3px 8px;
       }}
       .task-entry:focus {{
-          border-color: #38bdf8;
+          border-color: {accent};
           background: rgba(255, 255, 255, 0.12);
       }}
       .task-title-btn {{
@@ -1999,7 +1986,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           min-height: 17px;
           padding: 0;
           border-radius: 4px;
-          color: rgba(226, 232, 240, 0.6);
+          color: rgba(216, 222, 218, 0.6);
       }}
       .task-row-btn:hover {{
           color: #ffffff;
@@ -2009,7 +1996,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           all: unset;
           font-family: "{NERD_FONT}";
           font-size: 10px;
-          color: rgba(226, 232, 240, 0.6);
+          color: rgba(216, 222, 218, 0.6);
       }}
       .task-row-btn.nerd:hover label {{
           color: #ffffff;
@@ -2018,8 +2005,8 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           background: rgba(0, 0, 0, 0.65);
       }}
       .dialog-card {{
-          background: rgba(45, 49, 56, 0.98);
-          border: 1px solid rgba(255, 255, 255, 0.16);
+          background: {th.get('dialog_bg', 'rgba(28, 34, 31, 0.98)')};
+          border: 1px solid {th.get('card_border', 'rgba(255, 255, 255, 0.12)')};
           border-radius: 14px;
           padding: 16px;
           box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
@@ -2027,10 +2014,10 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
       .dialog-title {{
           font-size: 13px;
           font-weight: bold;
-          color: #f8fafc;
+          color: {th.get('text_fg', '#d8deda')};
       }}
       .dialog-close-btn {{
-          color: rgba(226, 232, 240, 0.6);
+          color: rgba(216, 222, 218, 0.6);
           font-size: 12px;
           padding: 2px 6px;
           border-radius: 6px;
@@ -2042,13 +2029,13 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
       .dialog-label {{
           font-size: 11px;
           font-weight: 500;
-          color: rgba(226, 232, 240, 0.75);
+          color: rgba(216, 222, 218, 0.75);
       }}
       .pill-btn {{
           background: rgba(255, 255, 255, 0.08);
           border: 1px solid rgba(255, 255, 255, 0.16);
           border-radius: 6px;
-          color: #e2e8f0;
+          color: {fg};
           font-size: 10px;
           padding: 2px 6px;
       }}
@@ -2060,42 +2047,43 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           background: rgba(255, 255, 255, 0.05);
           border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 8px;
-          color: #f8fafc;
+          color: {th.get('text_fg', '#d8deda')};
           font-size: 11px;
           padding: 6px;
       }}
       .task-notes-view:focus {{
-          border-color: #38bdf8;
+          border-color: {accent};
           background: rgba(255, 255, 255, 0.08);
       }}
       .dialog-save-btn {{
-          background: #3b82f6;
-          border: 1px solid #60a5fa;
+          background: {th.get('save_btn_bg', '#44544d')};
+          border: 1px solid {th.get('today_border', 'rgba(148, 186, 166, 0.35)')};
           border-radius: 8px;
-          color: #ffffff;
+          color: {th.get('today_fg', '#e8efe9')};
           font-weight: 600;
           font-size: 11px;
           padding: 5px 14px;
+          box-shadow: none;
       }}
       .dialog-save-btn:hover {{
-          background: #2563eb;
+          background: {th.get('save_btn_hover', '#50635b')};
       }}
       .dialog-delete-btn {{
-          background: rgba(244, 63, 94, 0.18);
-          border: 1px solid rgba(244, 63, 94, 0.45);
+          background: rgba(201, 127, 136, 0.18);
+          border: 1px solid rgba(201, 127, 136, 0.45);
           border-radius: 8px;
-          color: #f43f5e;
+          color: #c97f88;
           font-size: 11px;
           padding: 5px 10px;
       }}
       .dialog-delete-btn:hover {{
-          background: rgba(244, 63, 94, 0.32);
+          background: rgba(201, 127, 136, 0.32);
       }}
       .dialog-cancel-btn {{
           background: rgba(255, 255, 255, 0.08);
           border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 8px;
-          color: #e2e8f0;
+          color: {fg};
           font-size: 11px;
           padding: 5px 10px;
       }}
@@ -2106,12 +2094,12 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           background: rgba(255, 255, 255, 0.07);
           border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 8px;
-          color: #f8fafc;
+          color: {th.get('text_fg', '#d8deda')};
           font-size: 11px;
           padding: 2px 6px;
       }}
       dropdown:focus {{
-          border-color: #38bdf8;
+          border-color: {accent};
       }}
       @keyframes pulse {{
           0%, 100% {{ opacity: 1; }}
@@ -2165,6 +2153,8 @@ class DesktopBackgroundApp(Gtk.Application):
 
         # File monitor on CACHE_FILE for instant live sync with Waybar popup
         self._setup_file_monitor()
+        # Theme monitor for instant theme switching without restart
+        self._setup_theme_monitor()
 
         # Write PID file
         os.makedirs(os.path.dirname(BG_PID_FILE), exist_ok=True)
@@ -2194,6 +2184,27 @@ class DesktopBackgroundApp(Gtk.Application):
     def reload_all_windows(self):
         for w in self.windows:
             w.reload_data()
+        return False
+
+    def _setup_theme_monitor(self):
+        try:
+            os.makedirs(os.path.dirname(CURRENT_THEME_FILE), exist_ok=True)
+            if not os.path.exists(CURRENT_THEME_FILE):
+                with open(CURRENT_THEME_FILE, 'w') as f:
+                    json.dump(DEFAULT_THEME, f, indent=2)
+            gfile = Gio.File.new_for_path(CURRENT_THEME_FILE)
+            self._theme_monitor = gfile.monitor_file(Gio.FileMonitorFlags.NONE, None)
+            self._theme_monitor.connect("changed", self._on_theme_changed)
+        except Exception as e:
+            print(f'[bg theme monitor error] {e}', file=sys.stderr)
+
+    def _on_theme_changed(self, monitor, file, other_file, event_type):
+        if event_type in (Gio.FileMonitorEvent.CHANGES_DONE_HINT, Gio.FileMonitorEvent.CREATED):
+            GLib.idle_add(self.retheme_all_windows)
+
+    def retheme_all_windows(self):
+        for w in self.windows:
+            w.reload_theme()
         return False
 
 

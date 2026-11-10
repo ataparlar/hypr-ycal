@@ -1,0 +1,75 @@
+{
+  "name": "neutral-grey",
+  "display_name": "Neutral Grey",
+  "desktop_bg": "rgba(38, 41, 47, 0.88)",
+  "desktop_border": "rgba(255, 255, 255, 0.12)",
+  "card_bg": "rgba(48, 52, 60, 0.90)",
+  "card_border": "rgba(255, 255, 255, 0.10)",
+  "dialog_bg": "rgba(45, 49, 56, 0.98)",
+  "text_fg": "#e2e8f0",
+  "text_muted": "rgba(226, 232, 240, 0.55)",
+  "accent": "#38bdf8",
+  "today_bg": "#3b82f6",
+  "today_fg": "#ffffff",
+  "today_border": "rgba(59, 130, 246, 0.4)",
+  "save_btn_bg": "#3b82f6",
+  "save_btn_hover": "#2563eb",
+  "column_themes": [
+    {
+      "name": "sky",
+      "color": "#38bdf8",
+      "grad": "linear-gradient(90deg, #38bdf8, #0284c7)",
+      "bg_card": "rgba(48, 52, 60, 0.90)",
+      "border": "rgba(56, 189, 248, 0.35)",
+      "badge_bg": "rgba(56, 189, 248, 0.16)"
+    },
+    {
+      "name": "peach",
+      "color": "#fab387",
+      "grad": "linear-gradient(90deg, #fab387, #ea580c)",
+      "bg_card": "rgba(48, 52, 60, 0.90)",
+      "border": "rgba(250, 179, 135, 0.35)",
+      "badge_bg": "rgba(250, 179, 135, 0.16)"
+    },
+    {
+      "name": "mint",
+      "color": "#a6e3a1",
+      "grad": "linear-gradient(90deg, #a6e3a1, #059669)",
+      "bg_card": "rgba(48, 52, 60, 0.90)",
+      "border": "rgba(166, 227, 161, 0.35)",
+      "badge_bg": "rgba(166, 227, 161, 0.16)"
+    },
+    {
+      "name": "cyan",
+      "color": "#74c7ec",
+      "grad": "linear-gradient(90deg, #74c7ec, #0891b2)",
+      "bg_card": "rgba(48, 52, 60, 0.90)",
+      "border": "rgba(116, 199, 236, 0.35)",
+      "badge_bg": "rgba(116, 199, 236, 0.16)"
+    },
+    {
+      "name": "rose",
+      "color": "#f38ba8",
+      "grad": "linear-gradient(90deg, #f38ba8, #e11d48)",
+      "bg_card": "rgba(48, 52, 60, 0.90)",
+      "border": "rgba(243, 139, 168, 0.35)",
+      "badge_bg": "rgba(243, 139, 168, 0.16)"
+    },
+    {
+      "name": "amber",
+      "color": "#fbbf24",
+      "grad": "linear-gradient(90deg, #fbbf24, #d97706)",
+      "bg_card": "rgba(48, 52, 60, 0.90)",
+      "border": "rgba(251, 191, 36, 0.35)",
+      "badge_bg": "rgba(251, 191, 36, 0.16)"
+    },
+    {
+      "name": "teal",
+      "color": "#94e2d5",
+      "grad": "linear-gradient(90deg, #94e2d5, #0d9488)",
+      "bg_card": "rgba(48, 52, 60, 0.90)",
+      "border": "rgba(148, 226, 213, 0.35)",
+      "badge_bg": "rgba(148, 226, 213, 0.16)"
+    }
+  ]
+}
