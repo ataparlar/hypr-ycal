@@ -40,63 +40,63 @@ from popup import (
 BG_PID_FILE = os.path.expanduser('~/.cache/waybar-ycal/bg.pid')
 SYNC_INTERVAL_SEC = 15 * 60  # 15 minutes
 
-# Vibrant themes for task list columns (distinct, modern, non-monotone)
+# Vibrant themes for task list columns (clean grey card, distinct accent colors)
 LIST_THEMES = [
     {
-        'name': 'mauve',
-        'color': '#cba6f7',
-        'grad': 'linear-gradient(90deg, #cba6f7, #a855f7)',
-        'bg_card': 'linear-gradient(180deg, rgba(26, 21, 38, 0.93) 0%, rgba(17, 16, 28, 0.93) 100%)',
-        'border': 'rgba(203, 166, 247, 0.35)',
-        'badge_bg': 'rgba(203, 166, 247, 0.18)',
+        'name': 'sky',
+        'color': '#38bdf8',
+        'grad': 'linear-gradient(90deg, #38bdf8, #0284c7)',
+        'bg_card': 'rgba(48, 52, 60, 0.90)',
+        'border': 'rgba(56, 189, 248, 0.35)',
+        'badge_bg': 'rgba(56, 189, 248, 0.16)',
     },
     {
         'name': 'peach',
         'color': '#fab387',
-        'grad': 'linear-gradient(90deg, #fab387, #f97316)',
-        'bg_card': 'linear-gradient(180deg, rgba(34, 25, 22, 0.93) 0%, rgba(20, 17, 18, 0.93) 100%)',
+        'grad': 'linear-gradient(90deg, #fab387, #ea580c)',
+        'bg_card': 'rgba(48, 52, 60, 0.90)',
         'border': 'rgba(250, 179, 135, 0.35)',
-        'badge_bg': 'rgba(250, 179, 135, 0.18)',
+        'badge_bg': 'rgba(250, 179, 135, 0.16)',
     },
     {
         'name': 'mint',
         'color': '#a6e3a1',
-        'grad': 'linear-gradient(90deg, #a6e3a1, #10b981)',
-        'bg_card': 'linear-gradient(180deg, rgba(20, 32, 26, 0.93) 0%, rgba(15, 22, 19, 0.93) 100%)',
+        'grad': 'linear-gradient(90deg, #a6e3a1, #059669)',
+        'bg_card': 'rgba(48, 52, 60, 0.90)',
         'border': 'rgba(166, 227, 161, 0.35)',
-        'badge_bg': 'rgba(166, 227, 161, 0.18)',
+        'badge_bg': 'rgba(166, 227, 161, 0.16)',
     },
     {
         'name': 'cyan',
         'color': '#74c7ec',
-        'grad': 'linear-gradient(90deg, #74c7ec, #06b6d4)',
-        'bg_card': 'linear-gradient(180deg, rgba(18, 28, 38, 0.93) 0%, rgba(14, 19, 28, 0.93) 100%)',
+        'grad': 'linear-gradient(90deg, #74c7ec, #0891b2)',
+        'bg_card': 'rgba(48, 52, 60, 0.90)',
         'border': 'rgba(116, 199, 236, 0.35)',
-        'badge_bg': 'rgba(116, 199, 236, 0.18)',
+        'badge_bg': 'rgba(116, 199, 236, 0.16)',
     },
     {
         'name': 'rose',
         'color': '#f38ba8',
-        'grad': 'linear-gradient(90deg, #f38ba8, #ec4899)',
-        'bg_card': 'linear-gradient(180deg, rgba(35, 20, 28, 0.93) 0%, rgba(22, 15, 20, 0.93) 100%)',
+        'grad': 'linear-gradient(90deg, #f38ba8, #e11d48)',
+        'bg_card': 'rgba(48, 52, 60, 0.90)',
         'border': 'rgba(243, 139, 168, 0.35)',
-        'badge_bg': 'rgba(243, 139, 168, 0.18)',
+        'badge_bg': 'rgba(243, 139, 168, 0.16)',
     },
     {
-        'name': 'lavender',
-        'color': '#b4befe',
-        'grad': 'linear-gradient(90deg, #b4befe, #818cf8)',
-        'bg_card': 'linear-gradient(180deg, rgba(23, 24, 40, 0.93) 0%, rgba(16, 17, 28, 0.93) 100%)',
-        'border': 'rgba(180, 190, 254, 0.35)',
-        'badge_bg': 'rgba(180, 190, 254, 0.18)',
+        'name': 'amber',
+        'color': '#fbbf24',
+        'grad': 'linear-gradient(90deg, #fbbf24, #d97706)',
+        'bg_card': 'rgba(48, 52, 60, 0.90)',
+        'border': 'rgba(251, 191, 36, 0.35)',
+        'badge_bg': 'rgba(251, 191, 36, 0.16)',
     },
     {
         'name': 'teal',
         'color': '#94e2d5',
-        'grad': 'linear-gradient(90deg, #94e2d5, #14b8a6)',
-        'bg_card': 'linear-gradient(180deg, rgba(18, 32, 32, 0.93) 0%, rgba(14, 22, 22, 0.93) 100%)',
+        'grad': 'linear-gradient(90deg, #94e2d5, #0d9488)',
+        'bg_card': 'rgba(48, 52, 60, 0.90)',
         'border': 'rgba(148, 226, 213, 0.35)',
-        'badge_bg': 'rgba(148, 226, 213, 0.18)',
+        'badge_bg': 'rgba(148, 226, 213, 0.16)',
     },
 ]
 
@@ -707,7 +707,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         if is_subtask:
             item_row.set_margin_start(16)
             glyph = Gtk.Label()
-            glyph_color = theme['color'] if theme else '#cba6f7'
+            glyph_color = theme['color'] if theme else '#38bdf8'
             glyph.set_markup(f"<span color='{glyph_color}'>↳</span>")
             glyph.add_css_class('subtask-glyph')
             item_row.append(glyph)
@@ -805,7 +805,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         if not is_subtask:
             add_sub_btn = Gtk.Button()
             add_sub_lbl = Gtk.Label()
-            col_txt = theme['color'] if theme else '#cba6f7'
+            col_txt = theme['color'] if theme else '#38bdf8'
             add_sub_lbl.set_markup(f"<span color='{col_txt}'>↳+</span>")
             add_sub_lbl.set_halign(Gtk.Align.CENTER)
             add_sub_lbl.set_valign(Gtk.Align.CENTER)
@@ -1575,7 +1575,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
     def _apply_css(self):
         t = load_theme()
         fg = '#e2e8f0'
-        accent = '#a855f7'
+        accent = '#38bdf8'
         red = '#f43f5e'
         self._refresh_fg = hex_to_rgb_float(fg)
 
@@ -1583,31 +1583,30 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
       window {{
           background: transparent;
       }}
-      /* Atmospheric obsidian/midnight background for desktop, distinct from navbar */
+      /* Clean, plain, not-heavy grey backdrop for desktop */
       .desktop-bg {{
-          background: linear-gradient(155deg, rgba(11, 15, 25, 0.94) 0%, rgba(17, 24, 39, 0.94) 50%, rgba(15, 23, 42, 0.94) 100%);
+          background: rgba(38, 41, 47, 0.88);
           border-radius: 16px;
-          border: 1px solid rgba(168, 85, 247, 0.22);
+          border: 1px solid rgba(255, 255, 255, 0.12);
           padding: 8px 12px;
-          box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.4);
       }}
       .desktop-card {{
           border-radius: 12px;
           padding: 10px;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
       }}
       .desktop-header-card {{
-          background: linear-gradient(90deg, rgba(17, 24, 39, 0.92) 0%, rgba(28, 25, 45, 0.92) 100%);
-          border: 1px solid rgba(168, 85, 247, 0.3);
+          background: rgba(48, 52, 60, 0.90);
+          border: 1px solid rgba(255, 255, 255, 0.10);
+          border-radius: 12px;
           padding: 6px 14px;
       }}
       .calendar-card {{
-          background: linear-gradient(180deg, rgba(17, 24, 39, 0.92) 0%, rgba(15, 20, 32, 0.92) 100%);
-          border: 1px solid rgba(148, 163, 184, 0.2);
+          background: rgba(48, 52, 60, 0.90);
+          border: 1px solid rgba(255, 255, 255, 0.10);
       }}
       .agenda-card {{
-          background: linear-gradient(180deg, rgba(17, 24, 39, 0.92) 0%, rgba(15, 20, 32, 0.92) 100%);
-          border: 1px solid rgba(148, 163, 184, 0.2);
+          background: rgba(48, 52, 60, 0.90);
+          border: 1px solid rgba(255, 255, 255, 0.10);
       }}
       .header-date {{
           font-size: 13px;
@@ -1617,7 +1616,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
       .header-clock {{
           font-size: 13px;
           font-family: monospace;
-          color: #cba6f7;
+          color: #94a3b8;
           font-weight: bold;
       }}
       .status-pill {{
@@ -1632,9 +1631,9 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           color: #fab387;
       }}
       .pill-pending {{
-          border: 1px solid rgba(203, 166, 247, 0.4);
-          background: rgba(203, 166, 247, 0.15);
-          color: #cba6f7;
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          background: rgba(255, 255, 255, 0.08);
+          color: #e2e8f0;
       }}
       .pill-lists {{
           border: 1px solid rgba(116, 199, 236, 0.4);
@@ -1676,18 +1675,16 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           border-color: rgba(255, 255, 255, 0.25);
       }}
       .action-btn-primary {{
-          background: linear-gradient(135deg, #a855f7, #6366f1);
-          border: 1px solid #c084fc;
+          background: #3b82f6;
+          border: 1px solid #60a5fa;
           border-radius: 8px;
           color: #ffffff;
           font-weight: bold;
           font-size: 11px;
           padding: 4px 12px;
-          box-shadow: 0 2px 8px rgba(168, 85, 247, 0.35);
       }}
       .action-btn-primary:hover {{
-          background: linear-gradient(135deg, #b86bfc, #7579f3);
-          box-shadow: 0 4px 12px rgba(168, 85, 247, 0.5);
+          background: #2563eb;
       }}
       .calendar-title {{
           font-size: 11px;
@@ -1703,7 +1700,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           color: #ffffff;
       }}
       .weekday {{
-          color: rgba(226, 232, 240, 0.4);
+          color: rgba(226, 232, 240, 0.45);
           font-size: 10px;
           font-weight: 600;
       }}
@@ -1715,16 +1712,16 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           border-radius: 6px;
       }}
       .weekend-label {{
-          color: rgba(203, 166, 247, 0.65);
+          color: #94a3b8;
       }}
       .today {{
-          background: linear-gradient(135deg, #7c3aed, #6366f1);
+          background: #3b82f6;
           border-radius: 6px;
           font-weight: bold;
           color: #ffffff;
       }}
       .today:hover {{
-          background: linear-gradient(135deg, #8b5cf6, #7579f3);
+          background: #2563eb;
       }}
       .selected {{
           border: 2px solid #38bdf8;
@@ -1845,15 +1842,15 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           border-color: rgba(255, 255, 255, 0.14);
       }}
 
-      /* Theme: Mauve */
-      .kanban-theme-mauve {{
+      /* Theme: Sky */
+      .kanban-theme-sky {{
           background: {LIST_THEMES[0]['bg_card']};
           border: 1px solid {LIST_THEMES[0]['border']};
       }}
-      .accent-bg-mauve {{ background: {LIST_THEMES[0]['grad']}; }}
-      .badge-mauve {{ background: {LIST_THEMES[0]['badge_bg']}; color: {LIST_THEMES[0]['color']}; border: 1px solid rgba(203, 166, 247, 0.35); }}
-      .btn-mauve {{ background: {LIST_THEMES[0]['badge_bg']}; color: {LIST_THEMES[0]['color']}; }}
-      .footer-btn-mauve {{ background: {LIST_THEMES[0]['badge_bg']}; color: {LIST_THEMES[0]['color']}; border-color: rgba(203, 166, 247, 0.3); }}
+      .accent-bg-sky {{ background: {LIST_THEMES[0]['grad']}; }}
+      .badge-sky {{ background: {LIST_THEMES[0]['badge_bg']}; color: {LIST_THEMES[0]['color']}; border: 1px solid rgba(56, 189, 248, 0.35); }}
+      .btn-sky {{ background: {LIST_THEMES[0]['badge_bg']}; color: {LIST_THEMES[0]['color']}; }}
+      .footer-btn-sky {{ background: {LIST_THEMES[0]['badge_bg']}; color: {LIST_THEMES[0]['color']}; border-color: rgba(56, 189, 248, 0.3); }}
 
       /* Theme: Peach */
       .kanban-theme-peach {{
@@ -1895,15 +1892,15 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
       .btn-rose {{ background: {LIST_THEMES[4]['badge_bg']}; color: {LIST_THEMES[4]['color']}; }}
       .footer-btn-rose {{ background: {LIST_THEMES[4]['badge_bg']}; color: {LIST_THEMES[4]['color']}; border-color: rgba(243, 139, 168, 0.3); }}
 
-      /* Theme: Lavender */
-      .kanban-theme-lavender {{
+      /* Theme: Amber */
+      .kanban-theme-amber {{
           background: {LIST_THEMES[5]['bg_card']};
           border: 1px solid {LIST_THEMES[5]['border']};
       }}
-      .accent-bg-lavender {{ background: {LIST_THEMES[5]['grad']}; }}
-      .badge-lavender {{ background: {LIST_THEMES[5]['badge_bg']}; color: {LIST_THEMES[5]['color']}; border: 1px solid rgba(180, 190, 254, 0.35); }}
-      .btn-lavender {{ background: {LIST_THEMES[5]['badge_bg']}; color: {LIST_THEMES[5]['color']}; }}
-      .footer-btn-lavender {{ background: {LIST_THEMES[5]['badge_bg']}; color: {LIST_THEMES[5]['color']}; border-color: rgba(180, 190, 254, 0.3); }}
+      .accent-bg-amber {{ background: {LIST_THEMES[5]['grad']}; }}
+      .badge-amber {{ background: {LIST_THEMES[5]['badge_bg']}; color: {LIST_THEMES[5]['color']}; border: 1px solid rgba(251, 191, 36, 0.35); }}
+      .btn-amber {{ background: {LIST_THEMES[5]['badge_bg']}; color: {LIST_THEMES[5]['color']}; }}
+      .footer-btn-amber {{ background: {LIST_THEMES[5]['badge_bg']}; color: {LIST_THEMES[5]['color']}; border-color: rgba(251, 191, 36, 0.3); }}
 
       /* Theme: Teal */
       .kanban-theme-teal {{
@@ -1964,7 +1961,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           padding: 3px 8px;
       }}
       .task-entry:focus {{
-          border-color: #a855f7;
+          border-color: #38bdf8;
           background: rgba(255, 255, 255, 0.12);
       }}
       .task-title-btn {{
@@ -2018,14 +2015,14 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           color: #ffffff;
       }}
       .dialog-scrim {{
-          background: rgba(0, 0, 0, 0.7);
+          background: rgba(0, 0, 0, 0.65);
       }}
       .dialog-card {{
-          background: linear-gradient(155deg, #111827 0%, #1e1b4b 100%);
-          border: 1px solid rgba(168, 85, 247, 0.5);
+          background: rgba(45, 49, 56, 0.98);
+          border: 1px solid rgba(255, 255, 255, 0.16);
           border-radius: 14px;
           padding: 16px;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
       }}
       .dialog-title {{
           font-size: 13px;
@@ -2048,16 +2045,16 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           color: rgba(226, 232, 240, 0.75);
       }}
       .pill-btn {{
-          background: rgba(168, 85, 247, 0.15);
-          border: 1px solid rgba(168, 85, 247, 0.3);
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.16);
           border-radius: 6px;
           color: #e2e8f0;
           font-size: 10px;
           padding: 2px 6px;
       }}
       .pill-btn:hover {{
-          background: rgba(168, 85, 247, 0.3);
-          border-color: rgba(168, 85, 247, 0.6);
+          background: rgba(255, 255, 255, 0.16);
+          border-color: rgba(255, 255, 255, 0.3);
       }}
       .task-notes-view {{
           background: rgba(255, 255, 255, 0.05);
@@ -2068,12 +2065,12 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           padding: 6px;
       }}
       .task-notes-view:focus {{
-          border-color: #a855f7;
+          border-color: #38bdf8;
           background: rgba(255, 255, 255, 0.08);
       }}
       .dialog-save-btn {{
-          background: linear-gradient(135deg, #a855f7, #6366f1);
-          border: 1px solid #c084fc;
+          background: #3b82f6;
+          border: 1px solid #60a5fa;
           border-radius: 8px;
           color: #ffffff;
           font-weight: 600;
@@ -2081,7 +2078,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           padding: 5px 14px;
       }}
       .dialog-save-btn:hover {{
-          background: linear-gradient(135deg, #b86bfc, #7579f3);
+          background: #2563eb;
       }}
       .dialog-delete-btn {{
           background: rgba(244, 63, 94, 0.18);
@@ -2114,7 +2111,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           padding: 2px 6px;
       }}
       dropdown:focus {{
-          border-color: #a855f7;
+          border-color: #38bdf8;
       }}
       @keyframes pulse {{
           0%, 100% {{ opacity: 1; }}
