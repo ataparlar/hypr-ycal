@@ -3,9 +3,10 @@ from ctypes import CDLL
 CDLL('libgtk4-layer-shell.so')
 import gi
 gi.require_version("Gtk", "4.0")
+gi.require_version("Gio", "2.0")
 gi.require_version("Gtk4LayerShell", "1.0")
 gi.require_version("PangoCairo", "1.0")
-from gi.repository import Gtk, GLib, Gtk4LayerShell, Pango, PangoCairo
+from gi.repository import Gtk, Gio, GLib, Gtk4LayerShell, Pango, PangoCairo
 import calendar
 import datetime
 import html
@@ -290,9 +291,28 @@ class CalendarPopup(Gtk.ApplicationWindow):
         self._dialog_parent_ids = []
         self._shield = ClickShield(app, self._hide)
 
+        try:
+            gfile = Gio.File.new_for_path(CACHE_FILE)
+            self._file_monitor = gfile.monitor_file(Gio.FileMonitorFlags.NONE, None)
+            self._file_monitor.connect("changed", self._on_file_changed)
+        except Exception:
+            self._file_monitor = None
+
         self._setup_window()
         self._apply_css()
         self._build_ui()
+
+    def _on_file_changed(self, monitor, file, other_file, event_type):
+        if event_type in (Gio.FileMonitorEvent.CHANGES_DONE_HINT, Gio.FileMonitorEvent.CREATED):
+            if self.get_visible():
+                GLib.idle_add(self._reload_ui)
+
+    def _reload_ui(self):
+        self.events, self.task_lists = load_data()
+        self._build_grid()
+        self._update_day_panel(self.selected_date)
+        self._build_task_lists()
+        return False
 
     def _setup_window(self):
         self.set_decorated(False)
@@ -2135,11 +2155,17 @@ def on_activate(app):
     GLib.timeout_add_seconds(SYNC_INTERVAL_SEC, sync_in_background)
 
 
-app = Gtk.Application(application_id="com.waybar.ycal")
-app.connect("activate", on_activate)
+def main():
+    global win
+    app = Gtk.Application(application_id="com.waybar.ycal")
+    app.connect("activate", on_activate)
+    try:
+        app.run(None)
+    finally:
+        if os.path.exists(PID_FILE):
+            os.remove(PID_FILE)
 
-try:
-    app.run(None)
-finally:
-    if os.path.exists(PID_FILE):
-        os.remove(PID_FILE)
+
+if __name__ == '__main__':
+    main()
+

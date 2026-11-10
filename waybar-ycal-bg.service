@@ -1,0 +1,12 @@
+[Unit]
+Description=Waybar ycal Google Calendar & Tasks Hyprland Desktop Background
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/ataparlar/.config/waybar-ycal/bg.py
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=graphical-session.target
