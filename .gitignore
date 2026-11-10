@@ -1,1 +1,4 @@
+credentials.json
+client_secret*.json
+*.pid
 __pycache__/

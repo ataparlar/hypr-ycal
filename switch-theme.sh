@@ -38,12 +38,31 @@ list_themes() {
     echo "=========================================="
 }
 
-if [ -z "$1" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+SYNC_ALL=0
+THEME_NAME=""
+
+for arg in "$@"; do
+    case "$arg" in
+        --all|-a)
+            SYNC_ALL=1
+            ;;
+        -h|--help)
+            list_themes
+            exit 0
+            ;;
+        *)
+            if [ -z "$THEME_NAME" ]; then
+                THEME_NAME="$arg"
+            fi
+            ;;
+    esac
+done
+
+if [ -z "$THEME_NAME" ]; then
     list_themes
     exit 0
 fi
 
-THEME_NAME="$1"
 THEME_NAME="${THEME_NAME%.json}"
 THEME_SRC="$THEMES_DIR/${THEME_NAME}.json"
 
@@ -63,7 +82,7 @@ touch "$TARGET_THEME"
 echo "Applied theme '$THEME_NAME' to desktop dashboard."
 
 # Check if user requested syncing Waybar as well
-if [ "$2" = "--all" ] || [ "$2" = "-a" ]; then
+if [ "$SYNC_ALL" -eq 1 ]; then
     WAYBAR_SWITCHER="$HOME/.config/waybar/switch-theme.sh"
     if [ -x "$WAYBAR_SWITCHER" ]; then
         case "$THEME_NAME" in
