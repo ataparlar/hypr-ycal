@@ -726,8 +726,8 @@ class CalendarPopup(Gtk.ApplicationWindow):
             label.add_css_class('event-name')
 
             title = ev.get('title', '(no title)')
-            time_part = f"<span alpha='75%' font_size='9pt'>{ev['time']}</span>  " if ev.get('time') else ""
-            notes_icon = " <span alpha='50%' font_size='8pt'>\uf249</span>" if ev.get('notes') else ""
+            time_part = f"<span alpha='75%' size='small'>{ev['time']}</span>  " if ev.get('time') else ""
+            notes_icon = " <span alpha='50%' size='small'>\uf249</span>" if ev.get('notes') else ""
 
             if done:
                 label.set_markup(f"{time_part}<span alpha='50%'><s>{html.escape(title)}</s></span>{notes_icon}")
@@ -984,15 +984,15 @@ class CalendarPopup(Gtk.ApplicationWindow):
                 today = datetime.date.today()
                 time_str = f" {due_time}" if due_time else ""
                 if d_obj == today:
-                    due_badge = f"<span alpha='85%' font_size='8.5pt' color='#ffb86c'>Today{time_str}</span>"
+                    due_badge = f"<span alpha='85%' size='small' foreground='#ffb86c'>Today{time_str}</span>"
                 elif d_obj < today and not done:
-                    due_badge = f"<span font_size='8.5pt' color='#ff5555'>{d_obj.strftime('%d %b')}{time_str}</span>"
+                    due_badge = f"<span size='small' foreground='#ff5555'>{d_obj.strftime('%d %b')}{time_str}</span>"
                 else:
-                    due_badge = f"<span alpha='50%' font_size='8.5pt'>{d_obj.strftime('%d %b')}{time_str}</span>"
+                    due_badge = f"<span alpha='50%' size='small'>{d_obj.strftime('%d %b')}{time_str}</span>"
             except Exception:
                 due_badge = ""
 
-        notes_icon = " <span alpha='50%' font_size='8pt'>\uf249</span>" if task.get('notes') else ""
+        notes_icon = " <span alpha='50%' size='small'>\uf249</span>" if task.get('notes') else ""
 
         if done:
             name_lbl.set_markup(f"<span alpha='50%'><s>{html.escape(title)}</s></span>{notes_icon}")

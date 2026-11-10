@@ -40,6 +40,66 @@ from popup import (
 BG_PID_FILE = os.path.expanduser('~/.cache/waybar-ycal/bg.pid')
 SYNC_INTERVAL_SEC = 15 * 60  # 15 minutes
 
+# Vibrant themes for task list columns (distinct, modern, non-monotone)
+LIST_THEMES = [
+    {
+        'name': 'mauve',
+        'color': '#cba6f7',
+        'grad': 'linear-gradient(90deg, #cba6f7, #a855f7)',
+        'bg_card': 'linear-gradient(180deg, rgba(26, 21, 38, 0.93) 0%, rgba(17, 16, 28, 0.93) 100%)',
+        'border': 'rgba(203, 166, 247, 0.35)',
+        'badge_bg': 'rgba(203, 166, 247, 0.18)',
+    },
+    {
+        'name': 'peach',
+        'color': '#fab387',
+        'grad': 'linear-gradient(90deg, #fab387, #f97316)',
+        'bg_card': 'linear-gradient(180deg, rgba(34, 25, 22, 0.93) 0%, rgba(20, 17, 18, 0.93) 100%)',
+        'border': 'rgba(250, 179, 135, 0.35)',
+        'badge_bg': 'rgba(250, 179, 135, 0.18)',
+    },
+    {
+        'name': 'mint',
+        'color': '#a6e3a1',
+        'grad': 'linear-gradient(90deg, #a6e3a1, #10b981)',
+        'bg_card': 'linear-gradient(180deg, rgba(20, 32, 26, 0.93) 0%, rgba(15, 22, 19, 0.93) 100%)',
+        'border': 'rgba(166, 227, 161, 0.35)',
+        'badge_bg': 'rgba(166, 227, 161, 0.18)',
+    },
+    {
+        'name': 'cyan',
+        'color': '#74c7ec',
+        'grad': 'linear-gradient(90deg, #74c7ec, #06b6d4)',
+        'bg_card': 'linear-gradient(180deg, rgba(18, 28, 38, 0.93) 0%, rgba(14, 19, 28, 0.93) 100%)',
+        'border': 'rgba(116, 199, 236, 0.35)',
+        'badge_bg': 'rgba(116, 199, 236, 0.18)',
+    },
+    {
+        'name': 'rose',
+        'color': '#f38ba8',
+        'grad': 'linear-gradient(90deg, #f38ba8, #ec4899)',
+        'bg_card': 'linear-gradient(180deg, rgba(35, 20, 28, 0.93) 0%, rgba(22, 15, 20, 0.93) 100%)',
+        'border': 'rgba(243, 139, 168, 0.35)',
+        'badge_bg': 'rgba(243, 139, 168, 0.18)',
+    },
+    {
+        'name': 'lavender',
+        'color': '#b4befe',
+        'grad': 'linear-gradient(90deg, #b4befe, #818cf8)',
+        'bg_card': 'linear-gradient(180deg, rgba(23, 24, 40, 0.93) 0%, rgba(16, 17, 28, 0.93) 100%)',
+        'border': 'rgba(180, 190, 254, 0.35)',
+        'badge_bg': 'rgba(180, 190, 254, 0.18)',
+    },
+    {
+        'name': 'teal',
+        'color': '#94e2d5',
+        'grad': 'linear-gradient(90deg, #94e2d5, #14b8a6)',
+        'bg_card': 'linear-gradient(180deg, rgba(18, 32, 32, 0.93) 0%, rgba(14, 22, 22, 0.93) 100%)',
+        'border': 'rgba(148, 226, 213, 0.35)',
+        'badge_bg': 'rgba(148, 226, 213, 0.18)',
+    },
+]
+
 
 class DesktopBackgroundWindow(Gtk.ApplicationWindow):
     def __init__(self, app, monitor):
@@ -77,7 +137,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
                      Gtk4LayerShell.Edge.LEFT, Gtk4LayerShell.Edge.RIGHT]:
             Gtk4LayerShell.set_anchor(self, edge, True)
 
-        # Margin: Waybar is at top (height 31px), so leave 36px top margin
+        # Margin: Waybar is at top (height 31px), leave 36px top margin
         Gtk4LayerShell.set_margin(self, Gtk4LayerShell.Edge.TOP, 36)
         Gtk4LayerShell.set_margin(self, Gtk4LayerShell.Edge.BOTTOM, 10)
         Gtk4LayerShell.set_margin(self, Gtk4LayerShell.Edge.LEFT, 12)
@@ -119,15 +179,15 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         content_box.set_hexpand(True)
         self.main_box.append(content_box)
 
-        # ── Left Column: Calendar & Agenda ────────────────────────────
+        # ── Left Column: Calendar & Agenda (Compact: ~248px) ───────────
         self.left_col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-        self.left_col.set_size_request(340, -1)
+        self.left_col.set_size_request(248, -1)
         content_box.append(self.left_col)
 
         self._build_calendar_card()
         self._build_agenda_card()
 
-        # ── Right Column: Kanban Task Boards ──────────────────────────
+        # ── Right Column: Kanban Task Boards (Vibrant colors) ──────────
         self._build_task_boards(content_box)
 
         # ── Modal Task Creation/Edit Dialog ───────────────────────────
@@ -171,6 +231,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
 
         self.lists_pill = Gtk.Label()
         self.lists_pill.add_css_class('status-pill')
+        self.lists_pill.add_css_class('pill-lists')
 
         stats_box.append(self.due_pill)
         stats_box.append(self.pending_pill)
@@ -241,17 +302,18 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         lists_count = len(self.task_lists)
 
         self.due_pill.set_markup(f"<b>📌 {due_today_tasks}</b> Due Today")
-        self.pending_pill.set_markup(f"<b>📋 {total_pending}</b> Pending Tasks")
+        self.pending_pill.set_markup(f"<b>📋 {total_pending}</b> Pending")
         self.lists_pill.set_markup(f"<b>📁 {lists_count}</b> Lists")
 
     def _build_calendar_card(self):
-        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
         card.add_css_class('desktop-card')
-        card.set_size_request(-1, 305)
+        card.add_css_class('calendar-card')
+        card.set_size_request(-1, 260)
         self.left_col.append(card)
 
         # Header: Prev, Month Label, Next, Today button
-        hdr = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
+        hdr = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
         prev_btn = Gtk.Button(label="‹")
         prev_btn.add_css_class('nav-btn')
         prev_btn.connect("clicked", lambda _: self._navigate(-1))
@@ -290,7 +352,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
 
         self._selected_btn = None
         grid = Gtk.Grid()
-        grid.set_row_spacing(4)
+        grid.set_row_spacing(3)
         grid.set_column_spacing(2)
         grid.set_column_homogeneous(True)
         grid.set_hexpand(True)
@@ -301,7 +363,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
             lbl.add_css_class('weekday')
             if col >= 5:
                 lbl.add_css_class('weekend-label')
-            lbl.set_size_request(32, 20)
+            lbl.set_size_request(28, 16)
             grid.attach(lbl, col, 0, 1, 1)
 
         first = datetime.date(self.year, self.month, 1)
@@ -315,7 +377,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
             day_events = self.events.get(date.isoformat(), [])
 
             overlay = Gtk.Overlay()
-            overlay.set_size_request(32, 30)
+            overlay.set_size_request(28, 25)
 
             number = Gtk.Label(label=str(date.day))
             number.set_halign(Gtk.Align.CENTER)
@@ -329,8 +391,8 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
                 bar_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=2)
                 bar_box.set_halign(Gtk.Align.CENTER)
                 bar_box.set_valign(Gtk.Align.END)
-                bar_box.set_margin_bottom(4)
-                w = 10 if (has_events and has_tasks) else 20
+                bar_box.set_margin_bottom(2)
+                w = 8 if (has_events and has_tasks) else 16
                 if has_tasks:
                     task_bar = Gtk.Box()
                     task_bar.add_css_class('task-bar')
@@ -345,7 +407,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
 
             btn = Gtk.Button()
             btn.set_child(overlay)
-            btn.set_size_request(32, 30)
+            btn.set_size_request(28, 25)
             btn.date = date
             btn.connect("clicked", self._on_day_clicked)
 
@@ -386,6 +448,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
     def _build_agenda_card(self):
         self.agenda_card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         self.agenda_card.add_css_class('desktop-card')
+        self.agenda_card.add_css_class('agenda-card')
         self.agenda_card.set_vexpand(True)
         self.left_col.append(self.agenda_card)
 
@@ -403,9 +466,9 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         scroll.set_child(self.agenda_box)
 
         btn_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
-        btn_row.set_size_request(-1, 32)
+        btn_row.set_size_request(-1, 30)
 
-        add_task_day_btn = Gtk.Button(label="+ Task for this day")
+        add_task_day_btn = Gtk.Button(label="+ Task for Today")
         add_task_day_btn.add_css_class('add-btn')
         add_task_day_btn.set_hexpand(True)
         add_task_day_btn.connect(
@@ -417,7 +480,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         cal_icon = Gtk.Label(label="\uf073")
         cal_icon.add_css_class('nerd')
         open_day_cal_btn.set_child(cal_icon)
-        open_day_cal_btn.set_size_request(32, -1)
+        open_day_cal_btn.set_size_request(28, -1)
         open_day_cal_btn.add_css_class('add-btn')
         open_day_cal_btn.set_tooltip_text("Open day in Google Calendar")
         open_day_cal_btn.connect("clicked", self._on_open_day_cal_clicked)
@@ -430,9 +493,9 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
 
     def _update_agenda_card(self, date):
         if date == self.today:
-            heading = f"<b>Today</b>  <span alpha='65%'>{date.strftime('%A, %d %b')}</span>"
+            heading = f"<b>Today</b>  <span alpha='65%'>{date.strftime('%a, %d %b')}</span>"
         else:
-            heading = f"<b>{date.strftime('%A')}</b>  <span alpha='65%'>{date.strftime('%d %b %Y')}</span>"
+            heading = f"<b>{date.strftime('%a')}</b>  <span alpha='65%'>{date.strftime('%d %b %Y')}</span>"
         self.agenda_hdr.set_markup(heading)
 
         while True:
@@ -457,6 +520,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
 
     def _make_agenda_row(self, ev):
         row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        row.add_css_class('agenda-row')
 
         if isinstance(ev, dict):
             done = ev.get('done', False)
@@ -482,8 +546,8 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
             label.add_css_class('event-name')
 
             title = ev.get('title', '(no title)')
-            time_part = f"<span alpha='75%' font_size='9pt'>{ev['time']}</span>  " if ev.get('time') else ""
-            notes_icon = " <span alpha='50%' font_size='8pt'>\uf249</span>" if ev.get('notes') else ""
+            time_part = f"<span alpha='75%' size='small'>{ev['time']}</span>  " if ev.get('time') else ""
+            notes_icon = " <span alpha='50%' size='small'>\uf249</span>" if ev.get('notes') else ""
 
             if done:
                 label.set_markup(f"{time_part}<span alpha='50%'><s>{html.escape(title)}</s></span>{notes_icon}")
@@ -549,13 +613,23 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
             self.boards_box.append(empty)
             return
 
-        for tl in self.task_lists:
+        for idx, tl in enumerate(self.task_lists):
+            theme = LIST_THEMES[idx % len(LIST_THEMES)]
+
             col = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-            col.set_size_request(280, -1)
+            col.set_size_request(275, -1)
             col.set_vexpand(True)
             col.add_css_class('desktop-card')
             col.add_css_class('kanban-column')
+            col.add_css_class(f"kanban-theme-{theme['name']}")
             self.boards_box.append(col)
+
+            # Top colored accent line
+            accent_bar = Gtk.Box()
+            accent_bar.add_css_class('kanban-top-bar')
+            accent_bar.add_css_class(f"accent-bg-{theme['name']}")
+            accent_bar.set_size_request(-1, 3)
+            col.append(accent_bar)
 
             tl_tasks = tl.get('tasks', [])
 
@@ -573,7 +647,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
             hdr = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
             title_lbl = Gtk.Label()
             title_lbl.set_markup(
-                f"<b>{html.escape(tl.get('title', 'Tasks'))}</b>  <span alpha='65%'>({pending_count})</span>"
+                f"<span weight='bold' foreground='{theme['color']}'>{html.escape(tl.get('title', 'Tasks'))}</span>"
             )
             title_lbl.set_halign(Gtk.Align.START)
             title_lbl.set_hexpand(True)
@@ -582,8 +656,14 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
             title_lbl.add_css_class('kanban-title')
             hdr.append(title_lbl)
 
+            count_badge = Gtk.Label(label=str(pending_count))
+            count_badge.add_css_class('kanban-count-badge')
+            count_badge.add_css_class(f"badge-{theme['name']}")
+            hdr.append(count_badge)
+
             add_icon_btn = Gtk.Button(label="+")
-            add_icon_btn.add_css_class('task-row-btn')
+            add_icon_btn.add_css_class('theme-add-btn')
+            add_icon_btn.add_css_class(f"btn-{theme['name']}")
             add_icon_btn.set_tooltip_text(f"Add task to {tl.get('title', '')}")
             add_icon_btn.connect("clicked", lambda _, lid=tl['id']: self.open_task_dialog(mode='create', default_list_id=lid))
             hdr.append(add_icon_btn)
@@ -596,7 +676,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
             scroll.set_vexpand(True)
             col.append(scroll)
 
-            tasks_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+            tasks_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
             scroll.set_child(tasks_box)
 
             sorted_tasks = sorted(
@@ -606,7 +686,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
 
             if sorted_tasks:
                 for task in sorted_tasks:
-                    tasks_box.append(self._make_task_item_row(task, is_subtask=False))
+                    tasks_box.append(self._make_task_item_row(task, is_subtask=False, theme=theme))
             else:
                 empty = Gtk.Label(label="No tasks in this list")
                 empty.add_css_class('no-events')
@@ -614,18 +694,21 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
                 tasks_box.append(empty)
 
             # Column Footer
-            col.append(self._make_column_footer(tl))
+            col.append(self._make_column_footer(tl, theme))
 
-    def _make_task_item_row(self, task, is_subtask=False):
+    def _make_task_item_row(self, task, is_subtask=False, theme=None):
         done = task.get('done', False)
         subtasks = task.get('subtasks', [])
         has_subtasks = bool(subtasks) and not is_subtask
 
-        item_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
+        item_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
+        item_row.add_css_class('task-item-card')
 
         if is_subtask:
             item_row.set_margin_start(16)
-            glyph = Gtk.Label(label="↳")
+            glyph = Gtk.Label()
+            glyph_color = theme['color'] if theme else '#cba6f7'
+            glyph.set_markup(f"<span color='{glyph_color}'>↳</span>")
             glyph.add_css_class('subtask-glyph')
             item_row.append(glyph)
 
@@ -640,6 +723,8 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
             subs_done = sum(1 for s in subtasks if s.get('done'))
             toggle_lbl = Gtk.Label(label=f"{'▶' if is_collapsed else '▼'} {subs_done}/{len(subtasks)}")
             toggle_lbl.add_css_class('subtask-badge')
+            if theme:
+                toggle_lbl.add_css_class(f"badge-{theme['name']}")
 
             toggle_btn = Gtk.Button()
             toggle_btn.set_child(toggle_lbl)
@@ -682,15 +767,15 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
                 today = datetime.date.today()
                 time_str = f" {due_time}" if due_time else ""
                 if d_obj == today:
-                    due_badge = f"<span alpha='85%' font_size='8.5pt' color='#ffb86c'>Today{time_str}</span>"
+                    due_badge = f"<span foreground='#fab387' size='small'>Today{time_str}</span>"
                 elif d_obj < today and not done:
-                    due_badge = f"<span font_size='8.5pt' color='#ff5555'>{d_obj.strftime('%d %b')}{time_str}</span>"
+                    due_badge = f"<span foreground='#f38ba8' weight='bold' size='small'>{d_obj.strftime('%d %b')}{time_str}</span>"
                 else:
-                    due_badge = f"<span alpha='50%' font_size='8.5pt'>{d_obj.strftime('%d %b')}{time_str}</span>"
+                    due_badge = f"<span foreground='#a6e3a1' size='small'>{d_obj.strftime('%d %b')}{time_str}</span>"
             except Exception:
                 due_badge = ""
 
-        notes_icon = " <span alpha='50%' font_size='8pt'>\uf249</span>" if task.get('notes') else ""
+        notes_icon = " <span alpha='55%' size='small'>\uf249</span>" if task.get('notes') else ""
 
         if done:
             name_lbl.set_markup(f"<span alpha='50%'><s>{html.escape(title)}</s></span>{notes_icon}")
@@ -719,7 +804,9 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         # Add subtask button on parent tasks
         if not is_subtask:
             add_sub_btn = Gtk.Button()
-            add_sub_lbl = Gtk.Label(label="↳+")
+            add_sub_lbl = Gtk.Label()
+            col_txt = theme['color'] if theme else '#cba6f7'
+            add_sub_lbl.set_markup(f"<span color='{col_txt}'>↳+</span>")
             add_sub_lbl.set_halign(Gtk.Align.CENTER)
             add_sub_lbl.set_valign(Gtk.Align.CENTER)
             add_sub_btn.set_child(add_sub_lbl)
@@ -757,10 +844,10 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         if not has_subtasks:
             return item_row
 
-        container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
         container.append(item_row)
 
-        subtasks_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        subtasks_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
         is_collapsed = task['id'] in self._collapsed_parents
         subtasks_container.set_visible(not is_collapsed)
 
@@ -769,19 +856,21 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
             key=lambda t: (1 if t.get('done') else 0, t.get('due') or '9999-99-99')
         )
         for sub in sorted_subs:
-            subtasks_container.append(self._make_task_item_row(sub, is_subtask=True))
+            subtasks_container.append(self._make_task_item_row(sub, is_subtask=True, theme=theme))
 
         container.append(subtasks_container)
         return container
 
-    def _make_column_footer(self, tl):
+    def _make_column_footer(self, tl, theme=None):
         container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
 
         btn_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
-        btn_row.set_size_request(-1, 32)
+        btn_row.set_size_request(-1, 30)
 
         add_btn = Gtk.Button(label="+ Add")
-        add_btn.add_css_class('add-btn')
+        add_btn.add_css_class('kanban-footer-btn')
+        if theme:
+            add_btn.add_css_class(f"footer-btn-{theme['name']}")
         add_btn.set_hexpand(True)
         add_btn.set_tooltip_text("Quick task add (title only)")
 
@@ -791,7 +880,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         detail_lbl.set_valign(Gtk.Align.CENTER)
         detail_btn.set_child(detail_lbl)
         detail_btn.set_size_request(28, -1)
-        detail_btn.add_css_class('add-btn')
+        detail_btn.add_css_class('kanban-footer-btn')
         detail_btn.add_css_class('nerd')
         detail_btn.set_tooltip_text("Detailed task options (datetime, notes, subtask)")
         detail_btn.connect("clicked", lambda *_: self.open_task_dialog(mode='create', default_list_id=tl['id']))
@@ -802,7 +891,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         open_lbl.set_valign(Gtk.Align.CENTER)
         open_btn.set_child(open_lbl)
         open_btn.set_size_request(28, -1)
-        open_btn.add_css_class('add-btn')
+        open_btn.add_css_class('kanban-footer-btn')
         open_btn.add_css_class('nerd')
         open_btn.set_tooltip_text("Open Google Tasks in browser")
         open_btn.connect(
@@ -830,7 +919,7 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
         expand_lbl.set_valign(Gtk.Align.CENTER)
         expand_btn.set_child(expand_lbl)
         expand_btn.set_size_request(28, -1)
-        expand_btn.add_css_class('add-btn')
+        expand_btn.add_css_class('kanban-footer-btn')
         expand_btn.set_tooltip_text("Expand to detailed form")
         entry_row.append(expand_btn)
 
@@ -1485,59 +1574,77 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
 
     def _apply_css(self):
         t = load_theme()
-        fg = t['foreground']
-        bg = t['background']
-        accent = t['accent']
-        red = '#ff5555'
+        fg = '#e2e8f0'
+        accent = '#a855f7'
+        red = '#f43f5e'
         self._refresh_fg = hex_to_rgb_float(fg)
 
         css = f"""
       window {{
           background: transparent;
       }}
+      /* Atmospheric obsidian/midnight background for desktop, distinct from navbar */
       .desktop-bg {{
-          background: transparent;
-          padding: 0;
+          background: linear-gradient(155deg, rgba(11, 15, 25, 0.94) 0%, rgba(17, 24, 39, 0.94) 50%, rgba(15, 23, 42, 0.94) 100%);
+          border-radius: 16px;
+          border: 1px solid rgba(168, 85, 247, 0.22);
+          padding: 8px 12px;
+          box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.4);
       }}
       .desktop-card {{
-          background: {hex_to_rgba(bg, 0.88)};
-          border: 1px solid {hex_to_rgba(accent, 0.28)};
-          border-radius: 14px;
-          padding: 12px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+          border-radius: 12px;
+          padding: 10px;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
       }}
       .desktop-header-card {{
-          padding: 8px 16px;
+          background: linear-gradient(90deg, rgba(17, 24, 39, 0.92) 0%, rgba(28, 25, 45, 0.92) 100%);
+          border: 1px solid rgba(168, 85, 247, 0.3);
+          padding: 6px 14px;
+      }}
+      .calendar-card {{
+          background: linear-gradient(180deg, rgba(17, 24, 39, 0.92) 0%, rgba(15, 20, 32, 0.92) 100%);
+          border: 1px solid rgba(148, 163, 184, 0.2);
+      }}
+      .agenda-card {{
+          background: linear-gradient(180deg, rgba(17, 24, 39, 0.92) 0%, rgba(15, 20, 32, 0.92) 100%);
+          border: 1px solid rgba(148, 163, 184, 0.2);
       }}
       .header-date {{
-          font-size: 14px;
-          color: {fg};
+          font-size: 13px;
+          font-weight: bold;
+          color: #f8fafc;
       }}
       .header-clock {{
-          font-size: 14px;
+          font-size: 13px;
           font-family: monospace;
-          color: {accent};
+          color: #cba6f7;
+          font-weight: bold;
       }}
       .status-pill {{
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.12);
           border-radius: 8px;
-          padding: 4px 10px;
-          font-size: 11px;
-          color: {fg};
+          padding: 3px 9px;
+          font-size: 10.5px;
+          font-weight: 500;
       }}
       .pill-due {{
-          border-color: {hex_to_rgba(accent, 0.4)};
-          background: {hex_to_rgba(accent, 0.15)};
+          border: 1px solid rgba(250, 179, 135, 0.4);
+          background: rgba(250, 179, 135, 0.15);
+          color: #fab387;
       }}
       .pill-pending {{
-          border-color: rgba(255, 184, 108, 0.4);
-          background: rgba(255, 184, 108, 0.12);
+          border: 1px solid rgba(203, 166, 247, 0.4);
+          background: rgba(203, 166, 247, 0.15);
+          color: #cba6f7;
+      }}
+      .pill-lists {{
+          border: 1px solid rgba(116, 199, 236, 0.4);
+          background: rgba(116, 199, 236, 0.15);
+          color: #74c7ec;
       }}
       button {{
           background: transparent;
           border: 1px solid transparent;
-          border-radius: 10px;
+          border-radius: 8px;
           color: {fg};
           font-size: 11px;
           font-weight: 500;
@@ -1557,156 +1664,313 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           color: {fg};
       }}
       .action-btn {{
-          background: {hex_to_rgba(accent, 0.14)};
-          border: 1px solid {hex_to_rgba(accent, 0.35)};
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.14);
           border-radius: 8px;
-          color: {fg};
+          color: #e2e8f0;
           font-size: 11px;
-          padding: 5px 12px;
+          padding: 4px 10px;
       }}
       .action-btn:hover {{
-          background: {hex_to_rgba(accent, 0.28)};
+          background: rgba(255, 255, 255, 0.12);
+          border-color: rgba(255, 255, 255, 0.25);
       }}
       .action-btn-primary {{
-          background: {hex_to_rgba(accent, 0.85)};
-          border: 1px solid {accent};
+          background: linear-gradient(135deg, #a855f7, #6366f1);
+          border: 1px solid #c084fc;
           border-radius: 8px;
           color: #ffffff;
-          font-weight: 600;
+          font-weight: bold;
           font-size: 11px;
-          padding: 5px 14px;
+          padding: 4px 12px;
+          box-shadow: 0 2px 8px rgba(168, 85, 247, 0.35);
       }}
       .action-btn-primary:hover {{
-          background: {accent};
+          background: linear-gradient(135deg, #b86bfc, #7579f3);
+          box-shadow: 0 4px 12px rgba(168, 85, 247, 0.5);
       }}
       .calendar-title {{
-          font-size: 12px;
+          font-size: 11px;
           font-weight: bold;
-          color: {fg};
+          color: #e2e8f0;
       }}
       .nav-btn {{
-          padding: 2px 8px;
-          font-size: 14px;
+          padding: 1px 6px;
+          font-size: 13px;
+          color: rgba(226, 232, 240, 0.75);
+      }}
+      .nav-btn:hover {{
+          color: #ffffff;
       }}
       .weekday {{
-          color: {hex_to_rgba(fg, 0.45)};
-          font-size: 11px;
+          color: rgba(226, 232, 240, 0.4);
+          font-size: 10px;
+          font-weight: 600;
       }}
       .other-month {{
           opacity: 0.2;
       }}
       .weekend {{
-          background: {hex_to_rgba(fg, 0.04)};
-          border-radius: 10px;
+          background: rgba(255, 255, 255, 0.03);
+          border-radius: 6px;
       }}
       .weekend-label {{
-          color: {hex_to_rgba(accent, 0.6)};
+          color: rgba(203, 166, 247, 0.65);
       }}
       .today {{
-          background: {hex_to_rgba(accent, 0.5)};
-          border-radius: 10px;
+          background: linear-gradient(135deg, #7c3aed, #6366f1);
+          border-radius: 6px;
           font-weight: bold;
+          color: #ffffff;
       }}
       .today:hover {{
-          background: {hex_to_rgba(accent, 0.65)};
+          background: linear-gradient(135deg, #8b5cf6, #7579f3);
       }}
       .selected {{
-          border: 1px solid {hex_to_rgba(accent, 0.85)};
-          border-radius: 10px;
+          border: 2px solid #38bdf8;
+          border-radius: 6px;
       }}
       .today.selected {{
-          border: 1px solid {fg};
+          border: 2px solid #ffffff;
       }}
       .event-bar {{
-          background: {hex_to_rgba(accent, 0.9)};
+          background: #38bdf8;
           border-radius: 2px;
           min-height: 2px;
       }}
       .task-bar {{
-          background: {hex_to_rgba(red, 0.9)};
+          background: #f59e0b;
           border-radius: 2px;
           min-height: 2px;
       }}
       .agenda-heading {{
-          font-size: 12px;
+          font-size: 11.5px;
           margin-bottom: 2px;
+          color: #f1f5f9;
+      }}
+      .agenda-row {{
+          background: rgba(255, 255, 255, 0.035);
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 6px;
+          padding: 3px 6px;
       }}
       .event-dot {{
-          color: {hex_to_rgba(accent, 0.9)};
+          color: #38bdf8;
           font-size: 10px;
       }}
       .event-name {{
           font-size: 11px;
-          color: {fg};
+          color: #f1f5f9;
       }}
       .task-dot {{
-          color: {hex_to_rgba(red, 0.9)};
+          color: #f59e0b;
           font-size: 10px;
       }}
       .done-dot {{
-          color: {hex_to_rgba('#50fa7b', 0.9)};
+          color: #10b981;
           font-size: 10px;
       }}
       .done-toggle {{
           font-size: 10px;
-          min-width: 18px;
-          min-height: 18px;
+          min-width: 17px;
+          min-height: 17px;
           padding: 0;
           border-radius: 4px;
       }}
       .done-toggle-inactive {{
-          border: 1px solid {hex_to_rgba(fg, 0.2)};
+          border: 1px solid rgba(255, 255, 255, 0.2);
           color: transparent;
       }}
       .done-toggle-inactive:hover {{
-          border-color: {hex_to_rgba('#50fa7b', 0.6)};
-          color: {hex_to_rgba('#50fa7b', 0.6)};
+          border-color: #10b981;
+          color: #10b981;
       }}
       .done-toggle-active {{
-          border: 1px solid {hex_to_rgba('#50fa7b', 0.6)};
-          color: {hex_to_rgba('#50fa7b', 0.9)};
-          background: {hex_to_rgba('#50fa7b', 0.15)};
+          border: 1px solid #10b981;
+          color: #10b981;
+          background: rgba(16, 185, 129, 0.18);
       }}
       .no-events {{
           font-size: 11px;
-          color: {hex_to_rgba(fg, 0.35)};
+          color: rgba(226, 232, 240, 0.4);
           font-style: italic;
       }}
-      .kanban-column {{
-          padding: 10px 12px;
-      }}
-      .kanban-title {{
-          font-size: 12px;
-          font-weight: bold;
-          color: {fg};
-      }}
       .add-btn {{
-          background: {hex_to_rgba(accent, 0.15)};
-          border: 1px solid {hex_to_rgba(accent, 0.35)};
-          border-radius: 8px;
-          color: {fg};
-          font-size: 11px;
-          padding: 4px 0;
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 6px;
+          color: #e2e8f0;
+          font-size: 10.5px;
+          padding: 3px 0;
       }}
       .add-btn:hover {{
-          background: {hex_to_rgba(accent, 0.28)};
+          background: rgba(255, 255, 255, 0.12);
+      }}
+
+      /* ── Kanban Column Themes ──────────────────────────────── */
+      .kanban-column {{
+          padding: 8px 10px 10px 10px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      }}
+      .kanban-top-bar {{
+          border-radius: 3px;
+          margin-bottom: 4px;
+      }}
+      .kanban-title {{
+          font-size: 11px;
+          font-weight: bold;
+      }}
+      .kanban-count-badge {{
+          font-size: 9px;
+          font-weight: 600;
+          border-radius: 5px;
+          padding: 1px 5px;
+      }}
+      .theme-add-btn {{
+          font-size: 11px;
+          min-width: 18px;
+          min-height: 18px;
+          border-radius: 4px;
+          padding: 0;
+          font-weight: bold;
+      }}
+      .task-item-card {{
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          border-radius: 7px;
+          padding: 3px 6px;
+      }}
+      .task-item-card:hover {{
+          background: rgba(255, 255, 255, 0.07);
+          border-color: rgba(255, 255, 255, 0.14);
+      }}
+
+      /* Theme: Mauve */
+      .kanban-theme-mauve {{
+          background: {LIST_THEMES[0]['bg_card']};
+          border: 1px solid {LIST_THEMES[0]['border']};
+      }}
+      .accent-bg-mauve {{ background: {LIST_THEMES[0]['grad']}; }}
+      .badge-mauve {{ background: {LIST_THEMES[0]['badge_bg']}; color: {LIST_THEMES[0]['color']}; border: 1px solid rgba(203, 166, 247, 0.35); }}
+      .btn-mauve {{ background: {LIST_THEMES[0]['badge_bg']}; color: {LIST_THEMES[0]['color']}; }}
+      .footer-btn-mauve {{ background: {LIST_THEMES[0]['badge_bg']}; color: {LIST_THEMES[0]['color']}; border-color: rgba(203, 166, 247, 0.3); }}
+
+      /* Theme: Peach */
+      .kanban-theme-peach {{
+          background: {LIST_THEMES[1]['bg_card']};
+          border: 1px solid {LIST_THEMES[1]['border']};
+      }}
+      .accent-bg-peach {{ background: {LIST_THEMES[1]['grad']}; }}
+      .badge-peach {{ background: {LIST_THEMES[1]['badge_bg']}; color: {LIST_THEMES[1]['color']}; border: 1px solid rgba(250, 179, 135, 0.35); }}
+      .btn-peach {{ background: {LIST_THEMES[1]['badge_bg']}; color: {LIST_THEMES[1]['color']}; }}
+      .footer-btn-peach {{ background: {LIST_THEMES[1]['badge_bg']}; color: {LIST_THEMES[1]['color']}; border-color: rgba(250, 179, 135, 0.3); }}
+
+      /* Theme: Mint */
+      .kanban-theme-mint {{
+          background: {LIST_THEMES[2]['bg_card']};
+          border: 1px solid {LIST_THEMES[2]['border']};
+      }}
+      .accent-bg-mint {{ background: {LIST_THEMES[2]['grad']}; }}
+      .badge-mint {{ background: {LIST_THEMES[2]['badge_bg']}; color: {LIST_THEMES[2]['color']}; border: 1px solid rgba(166, 227, 161, 0.35); }}
+      .btn-mint {{ background: {LIST_THEMES[2]['badge_bg']}; color: {LIST_THEMES[2]['color']}; }}
+      .footer-btn-mint {{ background: {LIST_THEMES[2]['badge_bg']}; color: {LIST_THEMES[2]['color']}; border-color: rgba(166, 227, 161, 0.3); }}
+
+      /* Theme: Cyan */
+      .kanban-theme-cyan {{
+          background: {LIST_THEMES[3]['bg_card']};
+          border: 1px solid {LIST_THEMES[3]['border']};
+      }}
+      .accent-bg-cyan {{ background: {LIST_THEMES[3]['grad']}; }}
+      .badge-cyan {{ background: {LIST_THEMES[3]['badge_bg']}; color: {LIST_THEMES[3]['color']}; border: 1px solid rgba(116, 199, 236, 0.35); }}
+      .btn-cyan {{ background: {LIST_THEMES[3]['badge_bg']}; color: {LIST_THEMES[3]['color']}; }}
+      .footer-btn-cyan {{ background: {LIST_THEMES[3]['badge_bg']}; color: {LIST_THEMES[3]['color']}; border-color: rgba(116, 199, 236, 0.3); }}
+
+      /* Theme: Rose */
+      .kanban-theme-rose {{
+          background: {LIST_THEMES[4]['bg_card']};
+          border: 1px solid {LIST_THEMES[4]['border']};
+      }}
+      .accent-bg-rose {{ background: {LIST_THEMES[4]['grad']}; }}
+      .badge-rose {{ background: {LIST_THEMES[4]['badge_bg']}; color: {LIST_THEMES[4]['color']}; border: 1px solid rgba(243, 139, 168, 0.35); }}
+      .btn-rose {{ background: {LIST_THEMES[4]['badge_bg']}; color: {LIST_THEMES[4]['color']}; }}
+      .footer-btn-rose {{ background: {LIST_THEMES[4]['badge_bg']}; color: {LIST_THEMES[4]['color']}; border-color: rgba(243, 139, 168, 0.3); }}
+
+      /* Theme: Lavender */
+      .kanban-theme-lavender {{
+          background: {LIST_THEMES[5]['bg_card']};
+          border: 1px solid {LIST_THEMES[5]['border']};
+      }}
+      .accent-bg-lavender {{ background: {LIST_THEMES[5]['grad']}; }}
+      .badge-lavender {{ background: {LIST_THEMES[5]['badge_bg']}; color: {LIST_THEMES[5]['color']}; border: 1px solid rgba(180, 190, 254, 0.35); }}
+      .btn-lavender {{ background: {LIST_THEMES[5]['badge_bg']}; color: {LIST_THEMES[5]['color']}; }}
+      .footer-btn-lavender {{ background: {LIST_THEMES[5]['badge_bg']}; color: {LIST_THEMES[5]['color']}; border-color: rgba(180, 190, 254, 0.3); }}
+
+      /* Theme: Teal */
+      .kanban-theme-teal {{
+          background: {LIST_THEMES[6]['bg_card']};
+          border: 1px solid {LIST_THEMES[6]['border']};
+      }}
+      .accent-bg-teal {{ background: {LIST_THEMES[6]['grad']}; }}
+      .badge-teal {{ background: {LIST_THEMES[6]['badge_bg']}; color: {LIST_THEMES[6]['color']}; border: 1px solid rgba(148, 226, 213, 0.35); }}
+      .btn-teal {{ background: {LIST_THEMES[6]['badge_bg']}; color: {LIST_THEMES[6]['color']}; }}
+      .footer-btn-teal {{ background: {LIST_THEMES[6]['badge_bg']}; color: {LIST_THEMES[6]['color']}; border-color: rgba(148, 226, 213, 0.3); }}
+
+      /* ── Due Badges ────────────────────────────────────────── */
+      .due-today {{
+          background: rgba(250, 179, 135, 0.22);
+          color: #fab387;
+          border: 1px solid rgba(250, 179, 135, 0.45);
+          border-radius: 4px;
+          padding: 1px 4px;
+          font-size: 8.5pt;
+          font-weight: bold;
+      }}
+      .due-overdue {{
+          background: rgba(243, 139, 168, 0.22);
+          color: #f38ba8;
+          border: 1px solid rgba(243, 139, 168, 0.45);
+          border-radius: 4px;
+          padding: 1px 4px;
+          font-size: 8.5pt;
+          font-weight: bold;
+      }}
+      .due-future {{
+          background: rgba(116, 199, 236, 0.16);
+          color: #74c7ec;
+          border: 1px solid rgba(116, 199, 236, 0.3);
+          border-radius: 4px;
+          padding: 1px 4px;
+          font-size: 8.5pt;
+      }}
+
+      /* ── Footer & Subtasks ─────────────────────────────────── */
+      .kanban-footer-btn {{
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 6px;
+          color: #e2e8f0;
+          font-size: 10.5px;
+          padding: 3px 0;
+      }}
+      .kanban-footer-btn:hover {{
+          background: rgba(255, 255, 255, 0.12);
       }}
       .task-entry {{
           background: rgba(255, 255, 255, 0.08);
           border: 1px solid rgba(255, 255, 255, 0.15);
-          border-radius: 8px;
-          color: {fg};
+          border-radius: 6px;
+          color: #f8fafc;
           font-size: 11px;
-          padding: 4px 8px;
+          padding: 3px 8px;
       }}
       .task-entry:focus {{
-          border-color: {hex_to_rgba(accent, 0.8)};
+          border-color: #a855f7;
           background: rgba(255, 255, 255, 0.12);
       }}
       .task-title-btn {{
           background: transparent;
           border: none;
-          padding: 1px 3px;
+          padding: 1px 2px;
           margin: 0;
           border-radius: 4px;
       }}
@@ -1714,21 +1978,19 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           background: rgba(255, 255, 255, 0.06);
       }}
       .subtask-glyph {{
-          color: {hex_to_rgba(fg, 0.45)};
           font-size: 10px;
           margin-right: 2px;
       }}
       .subtask-badge {{
-          font-size: 9px;
-          color: {hex_to_rgba(accent, 0.9)};
-          background: {hex_to_rgba(accent, 0.15)};
+          font-size: 8.5pt;
           border-radius: 4px;
           padding: 1px 4px;
+          font-weight: 600;
       }}
       .subtasks-toggle-btn {{
-          padding: 0 4px;
-          min-width: 16px;
-          min-height: 16px;
+          padding: 0 3px;
+          min-width: 15px;
+          min-height: 15px;
           border-radius: 4px;
       }}
       .subtasks-toggle-btn:hover {{
@@ -1736,109 +1998,109 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
       }}
       .task-row-btn {{
           font-size: 10px;
-          min-width: 18px;
-          min-height: 18px;
+          min-width: 17px;
+          min-height: 17px;
           padding: 0;
           border-radius: 4px;
-          color: {hex_to_rgba(fg, 0.55)};
+          color: rgba(226, 232, 240, 0.6);
       }}
       .task-row-btn:hover {{
-          color: {fg};
-          background: rgba(255, 255, 255, 0.12);
+          color: #ffffff;
+          background: rgba(255, 255, 255, 0.14);
       }}
       .task-row-btn.nerd label {{
           all: unset;
           font-family: "{NERD_FONT}";
           font-size: 10px;
-          color: {hex_to_rgba(fg, 0.55)};
+          color: rgba(226, 232, 240, 0.6);
       }}
       .task-row-btn.nerd:hover label {{
-          color: {fg};
+          color: #ffffff;
       }}
       .dialog-scrim {{
-          background: rgba(0, 0, 0, 0.65);
+          background: rgba(0, 0, 0, 0.7);
       }}
       .dialog-card {{
-          background: {hex_to_rgba(bg, 0.98)};
-          border: 1px solid {hex_to_rgba(accent, 0.5)};
+          background: linear-gradient(155deg, #111827 0%, #1e1b4b 100%);
+          border: 1px solid rgba(168, 85, 247, 0.5);
           border-radius: 14px;
           padding: 16px;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
       }}
       .dialog-title {{
           font-size: 13px;
           font-weight: bold;
-          color: {fg};
+          color: #f8fafc;
       }}
       .dialog-close-btn {{
-          color: {hex_to_rgba(fg, 0.6)};
+          color: rgba(226, 232, 240, 0.6);
           font-size: 12px;
           padding: 2px 6px;
           border-radius: 6px;
       }}
       .dialog-close-btn:hover {{
-          color: {fg};
+          color: #ffffff;
           background: rgba(255, 255, 255, 0.1);
       }}
       .dialog-label {{
           font-size: 11px;
           font-weight: 500;
-          color: {hex_to_rgba(fg, 0.75)};
+          color: rgba(226, 232, 240, 0.75);
       }}
       .pill-btn {{
-          background: {hex_to_rgba(accent, 0.12)};
-          border: 1px solid {hex_to_rgba(accent, 0.25)};
+          background: rgba(168, 85, 247, 0.15);
+          border: 1px solid rgba(168, 85, 247, 0.3);
           border-radius: 6px;
-          color: {fg};
+          color: #e2e8f0;
           font-size: 10px;
           padding: 2px 6px;
       }}
       .pill-btn:hover {{
-          background: {hex_to_rgba(accent, 0.28)};
-          border-color: {hex_to_rgba(accent, 0.5)};
+          background: rgba(168, 85, 247, 0.3);
+          border-color: rgba(168, 85, 247, 0.6);
       }}
       .task-notes-view {{
           background: rgba(255, 255, 255, 0.05);
           border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 8px;
-          color: {fg};
+          color: #f8fafc;
           font-size: 11px;
           padding: 6px;
       }}
       .task-notes-view:focus {{
-          border-color: {hex_to_rgba(accent, 0.8)};
+          border-color: #a855f7;
           background: rgba(255, 255, 255, 0.08);
       }}
       .dialog-save-btn {{
-          background: {hex_to_rgba(accent, 0.85)};
-          border: 1px solid {accent};
+          background: linear-gradient(135deg, #a855f7, #6366f1);
+          border: 1px solid #c084fc;
           border-radius: 8px;
           color: #ffffff;
           font-weight: 600;
           font-size: 11px;
-          padding: 4px 14px;
+          padding: 5px 14px;
       }}
       .dialog-save-btn:hover {{
-          background: {accent};
+          background: linear-gradient(135deg, #b86bfc, #7579f3);
       }}
       .dialog-delete-btn {{
-          background: {hex_to_rgba(red, 0.15)};
-          border: 1px solid {hex_to_rgba(red, 0.4)};
+          background: rgba(244, 63, 94, 0.18);
+          border: 1px solid rgba(244, 63, 94, 0.45);
           border-radius: 8px;
-          color: {red};
+          color: #f43f5e;
           font-size: 11px;
-          padding: 4px 10px;
+          padding: 5px 10px;
       }}
       .dialog-delete-btn:hover {{
-          background: {hex_to_rgba(red, 0.3)};
+          background: rgba(244, 63, 94, 0.32);
       }}
       .dialog-cancel-btn {{
           background: rgba(255, 255, 255, 0.08);
           border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 8px;
-          color: {fg};
+          color: #e2e8f0;
           font-size: 11px;
-          padding: 4px 10px;
+          padding: 5px 10px;
       }}
       .dialog-cancel-btn:hover {{
           background: rgba(255, 255, 255, 0.15);
@@ -1847,12 +2109,12 @@ class DesktopBackgroundWindow(Gtk.ApplicationWindow):
           background: rgba(255, 255, 255, 0.07);
           border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 8px;
-          color: {fg};
+          color: #f8fafc;
           font-size: 11px;
           padding: 2px 6px;
       }}
       dropdown:focus {{
-          border-color: {hex_to_rgba(accent, 0.8)};
+          border-color: #a855f7;
       }}
       @keyframes pulse {{
           0%, 100% {{ opacity: 1; }}
@@ -1882,14 +2144,12 @@ class DesktopBackgroundApp(Gtk.Application):
         monitors = display.get_monitors()
 
         def create_windows():
-            # Clear old
             for w in self.windows:
                 w.destroy()
             self.windows = []
 
             n = monitors.get_n_items()
             if n == 0:
-                # Fallback to no explicit monitor
                 w = DesktopBackgroundWindow(self, None)
                 w.present()
                 self.windows.append(w)
