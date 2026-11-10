@@ -1,0 +1,6 @@
+{
+  "calendar_width": 165,
+  "task_panels_fill_rest": true,
+  "task_panel_min_width": 260,
+  "_comment": "calendar_width: Left column width in pixels (165 = 2/3 compact, 248 = standard, 340 = wide) or ratio string ('20%', '33%'). task_panels_fill_rest: Expands task boards to fill the rest of the desktop width."
+}

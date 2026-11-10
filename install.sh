@@ -19,7 +19,10 @@ cp -a switch-theme.sh "$DEST_DIR/"
 cp -a credentials.json.example "$DEST_DIR/"
 cp -a themes/* "$DEST_DIR/themes/"
 
-# Set initial theme if not present
+# Set initial config and theme if not present
+if [ ! -f "$DEST_DIR/config.json" ]; then
+    cp -a config.json "$DEST_DIR/"
+fi
 if [ ! -f "$DEST_DIR/current_theme.json" ]; then
     cp "$DEST_DIR/themes/dark-pastel-grey-green.json" "$DEST_DIR/current_theme.json"
     echo "dark-pastel-grey-green" > "$DEST_DIR/.current-theme"
